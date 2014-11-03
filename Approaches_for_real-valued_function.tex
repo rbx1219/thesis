@@ -294,7 +294,7 @@ search space, and higher step size helps the search with it.
 It is not applicable to choose a fixed step size for the whole
 optimization cycle for real-valued function optimization problems.  In
 early stages of the search, we should avoid searching in a limited small
-area and probe into the region that has not been fetched yet, and this
+area and probe into the region that has not been reached yet, and this
 implies the ability of exploration is far more vital at the early stage
 of search.  On the other hand, the ability of exploitation is more
 essential in the late stage.  With convincing overview, the optimization
@@ -459,7 +459,7 @@ value.  From the shown distribution of fitness we can
 imagine that there should be a number of valley, which
 we refer to as local optimum, in real-valued
 optimization problems.  With a small population, it is
-impossible to fetch global optimum unless the initial
+impossible to reach global optimum unless the initial
 population are just sampled right around the best
 valley.  Due to the rugged property of real-valued
 optimization problems, CMA-ES being a good local
@@ -495,60 +495,60 @@ population size is not useful under the mechanism.
 \subsection{The hypothesis to conquer the
                     difficulty}
 
-                    The original form of CMA-ES faces the problem
-                    described above.  To conquer the difficulty of
-                    \emph{non-convex}, the first idea comes from that if
-                    we are able to roughly estimate the region where the
-                    global optimum locates.  Once there is just a small
-                    region, CMA-ES is believed to be capable of finding
-                    out the optimum inside.  The technique of estimation
-                    can be built in many ways.  For example, in
-                    section~\ref{sec:rECGA} rECGA applies discretization
-                    to reduce the search space from an infinite,
-                    continuous space to a finite, discrete space.
-                    Followed with model building to distinguish the
-                    region where the global optimum may locate.
+The original form of CMA-ES faces the problem
+described above.  To conquer the difficulty of
+\emph{non-convex}, the first idea comes from that if
+we are able to roughly estimate the region where the
+global optimum locates.  Once there is just a small
+region, CMA-ES is believed to be capable of finding
+out the optimum inside.  The technique of estimation
+can be built in many ways.  For example, in
+section~\ref{sec:rECGA} rECGA applies discretization
+to reduce the search space from an infinite,
+continuous space to a finite, discrete space.
+Followed with model building to distinguish the
+region where the global optimum may locate.
 
-                    Inspired from the concept of discretization, we
-                    consider it possible to increase the performance of
-                    CMA-ES when dealing with \emph{non-convex} problems.
-                    Since CMA-ES majors in finding local optimum while
-                    rECGA is famous for the ability to extract linkage
-                    information, we don't think it appropriate to
-                    integrate SoD directly into CMA-ES.  To be detail,
-                    the reason can be described that local optimizer is
-                    only taken every $L$ generations in rECGA, which
-                    means the power of local optimizer is not the
-                    definitive factor which affects the performance of
-                    rECGA.
+Inspired from the concept of discretization, we
+consider it possible to increase the performance of
+CMA-ES when dealing with \emph{non-convex} problems.
+Since CMA-ES majors in finding local optimum while
+rECGA is famous for the ability to extract linkage
+information, we don't think it appropriate to
+integrate SoD directly into CMA-ES.  To be detail,
+the reason can be described that local optimizer is
+only taken every $L$ generations in rECGA, which
+means the power of local optimizer is not the
+definitive factor which affects the performance of
+rECGA.
 
-                    Since CMA-ES is with the ability to converge fast,
-                    observing a valley is kind of easy job.  That is to
-                    say, CMA-ES makes it fast to converge in one region.
-                    Based on the property of good performance in
-                    exploitation, the template of our hypothesis is
-                    illustrated in the following.  To conquer the
-                    \emph{non-convex} problem, a large population is
-                    again sampled uniformly in the search space.  As
-                    described, the native CMA-ES is not able to take
-                    advantages from the diversity.  Therefore, we divide
-                    these huge population into several groups.  Being an
-                    outstanding optimizer, CMA-ES can easily evaluate
-                    local optimum of each group.  The main assumption is
-                    that the information of global optimum can be
-                    extracted from these groups.  To be precise, by
-                    evolving each group under some specific order and
-                    choosing a representative solution for the
-                    distribution, we wish to evolve the set consists of
-                    representative solutions according to some method
-                    and then fetch the cliff as close to the global
-                    optimum as possible.
+Since CMA-ES is with the ability to converge fast,
+observing a valley is kind of easy job.  That is to
+say, CMA-ES makes it fast to converge in one region.
+Based on the property of good performance in
+exploitation, the template of our hypothesis is
+illustrated in the following.  To conquer the
+\emph{non-convex} problem, a large population is
+again sampled uniformly in the search space.  As
+described, the native CMA-ES is not able to take
+advantages from the diversity.  Therefore, we divide
+these huge population into several groups.  Being an
+outstanding optimizer, CMA-ES can easily evaluate
+local optimum of each group.  The main assumption is
+that the information of global optimum can be
+extracted from these groups.  To be precise, by
+evolving each group under some specific order and
+choosing a representative solution for the
+distribution, we wish to evolve the set consists of
+representative solutions according to some method
+and then reach the cliff as close to the global
+optimum as possible.
 
-                    To sum up, the hypothesis wishes to benefit from the
-                    diversity brought by a large population.  Inspired
-                    by discretization, we divide the population into
-                    groups in order to keep diversity.  An approach
-                    should be supplied to communicate among the groups,
-                    thus we are able to take advantages from the
-                    discretization. Instances of the hypothesis will be
-                    proposed in the next chapter.  
+To sum up, the hypothesis wishes to benefit from the
+diversity brought by a large population.  Inspired
+by discretization, we divide the population into
+groups in order to keep diversity.  An approach
+should be supplied to communicate among the groups,
+thus we are able to take advantages from the
+discretization. Instances of the hypothesis will be
+proposed in the next chapter.  
