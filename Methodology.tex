@@ -1,0 +1,457 @@
+\chapter{Methodology} \label{ch:method}
+
+In previous chapter, the hypothesis of this work is provided.
+This chapter describes how we implemented the system in detail.
+Section~\ref{sec:overview}
+gives a brief overview for the system.
+A pure 2-layer CMA-ES will be described in~\ref{sec:2layer} and a
+modified one will be given in~\ref{MAB-based}.
+
+\section{Overview} \label{sec:overview}
+
+According to our hypothesis, the proposed system must have the ability of
+clustering.
+This is because the initialization is assumed to be uniformly
+sampled in the search space without any prerequisite, and we wish to divide the
+population into groups under some criteria such as distance between solutions.
+Besides, in order to extract information between groups, our system
+demands a method to evolve the divided groups.
+There is an objective function to obtain the values of candidate
+solutions, but there is no measurement to evaluate fitness of the
+groups.
+A simple method is using a representative solution, such as the best
+member or the central of the group and the member with median objective
+function value.
+At last, we have to define the timing of the switching time from the
+original computation level to the second layer computation. 
+
+A simple flow can be given in Algorithm~\ref{algo:overview}.
+
+\begin{algorithm}[H]
+  \label{algo:overview}
+  Initializing population\;
+	Clustering\;
+  \While{not terminate}
+  {
+    \While{any group has not been evolved for certain generation}
+    {
+    Evolving each group\;
+    }
+    Selecting candidates for each group\;
+    Evolving the selected solutions\;
+  }
+  \caption{Overview of the system}
+\end{algorithm}
+In the following sections, related works about
+division and the method of evaluating second layer will be introduced.
+Section~\ref{sec:2layer}
+gives a simple instance for the system and section~\ref{MAB-based} gives a
+modified one.
+
+\section{2-Layer CMA-ES} \label{sec:2layer}
+
+To verify the assumption that dividing the population increases the
+diversity, we designed an algorithm in this section. 
+%To give instances for the template, we are going to supply implementation for
+%the division and the evaluation strategy for the 2-layers approach.
+As the population are represented as vectors, we divided the population
+according to space locality.
+The reason to do so is that a group in a specific region would converge
+to the same local optima.
+In order to keep diversity, all of groups are suggested to maintain
+their representativeness, which we can gain from space locality.
+As a result, a clustering method able to gather nearby solutions
+together is essential.
+
+\subsection{k-means}
+
+To split the population into groups according to space locality, the
+coming idea is applying the technique of clustering.
+Many approaches have been proposed in the field of clustering.
+\emph{k-means}, a member of the family of vector quantization, is a
+popular skill for cluster analysis in data mining.
+\emph{k-means} aims to partition $n$ observations into $k$ clusters
+where $k < n $.
+Obtaining the best partition without given $k$ and dimension of
+observations $d$ is proved to be computationally difficult (NP-hard).
+As a result, to determine the value of $k$, this thesis takes the rule
+of thumb which sets $k = \sqrt{\frac{n}{2}}$.
+
+There are some efficient heuristic algorithms to make \emph{k-means}
+converge to a local optimum quickly.
+An iterative refinement approach is provided: \emph{k-means} selects
+out $k$ centroids as the center of $k$ groups.
+Subsequently, every observation are assigned to the center which is closest.
+Before the end of an iteration, the center is updated by the mean of all vectors
+belong to it.A detail formulation can be given as following.
+
+Given a set of observations $\left( x_1, x_2, \ldots, x_n\right)$ where each
+observation is a $d$-dimensional vector, \emph{k-means} clustering aims to
+partition the set into $k$ sets $\mathcal{S} = \{ S_1, S_2, \ldots, S_k \}$ such
+that the sum of the squares within cluster is minimized.
+That is to say, the objective is to find:
+\[arg\min_{\mathcal{S}}\sum\limits_{i=1}^k \sum\limits_{x \in S_i}
+\|x-\mu_i\|\], where $\mu_i$ is the arithmetic mean of vectors in $S_i$.
+
+In this thesis the initialization method is referred to as \emph{Forgy method}.
+The overall procedure of the modified \emph{k-means} can be algorithmically
+outlined as Algorithm~\ref{algo:kmeans}.
+
+\begin{algorithm}[H]
+  \label{algo:kmeans}
+	 \KwIn{$k$, $d$, $\{o_1, o_2,\ldots, o_n\}$ as
+	observations} \KwOut{$\mathcal{S}$} Initial: $m_1, m_2,\ldots, m_k$ are
+	random selected from observations as initial centers\; \While{At least one
+	of the observations moves to other group} { \For{j = 1 to k} { $S_j =
+		\emptyset$	\; } \For{i = 1 to n} { assign $o_i$ to $S_j$ if $o_i$ is
+		closest to $m_j$ among the $k$ centers\; } \For{j = 1 to k} { $m_j$ is
+	updated by the arithmetic mean of all vectors $\in S_j$\; } } 
+  \caption{k-means}
+\end{algorithm}
+
+The described procedure shows an approach that can quickly obtain local
+optimum.
+Due to the initialization of $m$ centers, the proposed procedure is an
+unstable approach.
+In other words, with different initial set of centers, the output of the
+algorithm is different even consisting of the same observations.
+However, in practice, this is an method that is easy to
+implement and performs acceptably.
+
+
+\subsection{Methodology}
+
+The characteristic of the algorithm is that it maintains a larger
+population, which is inefficient in the original CMA-ES, so that it may
+obtain better diversity of a real-valued problem.
+Recalled from the flow giving in section~\ref{sec:overview}, 2 criteria
+have not been determined yet: (1) the method to choose representative
+solutions and (2) the timing to switch from bottom layer to the top one.
+In this algorithm, we take the local optima of groups after executing
+CMA-ES for a given generation as the representative solutions.
+Also, a given generation is adopted to control the number of iterations
+for each group.
+The main purpose of this 2-layer CMA-ES is to distinguish the ability of
+division, and roughly evolve the groups to extract the information
+inside.
+Consequently, the remaining criteria are set to be simple so that we can
+verify our assumption directly.
+
+A detail algorithm can be illustrated as following\\
+\begin{algorithm}[H]{
+		\caption{2-layer CMA-ES}
+    \KwIn{$n$,$t$}
+    \KwOut{best solution ever evolved}
+    Uniformly sampled population of size $n$\;
+    $k = \sqrt{\frac{n}{2}}$\;
+    Integrating \emph{k-means} with \emph{Frogy-method} to cluster the
+    $n$ individuals into $k$ groups\;
+
+		$C\leftarrow$ array with size $k$\;
+    \For{i = 1 to k}
+    {
+      Optimizing group$_i$ by adopting CMA-ES for $t$ generations\;
+			$C_i\leftarrow$ best solution\;
+      Applying CMA-ES to evolve the population consisting of local
+      optima of groups as known as $C$ until terminated.\;
+    }
+}
+\end{algorithm}
+
+The proposed algorithm lays emphasis on maintaining the diversity, and
+we can surmise that there should be trade-off to benefit from the large
+population.
+This is obvious in minimizing convex functions, which we refer to as
+unimodal problems.
+In a unimodal problem, we can gain from the algorithm that $C_1, C_2,
+\ldots, C_k$ are driven toward the only optimum for CMA-ES being a good
+local optimizer.
+Accordingly, optimization is repeated for $k-1$ times, which is
+expensive, especially when evaluating the objective function is costive.
+
+
+\section{MAB-based CMA-ES} \label{MAB-based}
+
+The previous section introduces a 2-layer CMA-ES trying to benefit from
+a large population.
+However, the algorithm does not take group priority into consideration,
+and we wondered if any priority between groups should be claimed.
+That is to say, if a group seems impossible for the global optimum to
+exist, we should focus on the possible ones in order to obtain better
+solutions.
+Furthermore, we would like to design a mechanism to drop off groups that
+contribute nothing anymore for extracting information between groups.
+
+To sum up, this section introduces a modified version of the algorithm
+proposed in the previous section.
+The motivation behind this design is to make the search escape from the
+ruggedness hazard and jump to a better cliff in the search space.
+What we try to offer in this section is providing a selection and
+dropping strategy in order to extract the information hided between
+groups.
+
+\subsection{Multi-armed bandit problems}
+
+Multi-armed bandit (MAB) problems are a class of sequential resources
+allocating problems.
+MAB problems are about allocating resources among several competing
+objects, which addresses the priority between competitors, and
+we can model our problem finding regions where better solutions may
+locate as a MAB problem.
+We give detail introduction to the MAB problems and
+integrate the method to modify the proposed 2-layer CMA-ES.
+
+\subsubsection{Problem description}
+
+We are going to illustrate the problem in advance by giving an
+example.
+Assume a gambler is with a row of $k$ slot machines which are
+also referred to as `one-armed bandits', and he decides to play them in
+a sequence.
+The slot machines output rewards according to built-in distributions,
+and the distributions are different between each machines.
+Without any prior knowledge (e.g.\ distributions), what the gambler can
+obtain is only the given reward every time he pays and pulls the bandit.
+The goal of the problem in this example is to maximize the rewards
+according to the recorded sequence of rewards along with the index of
+machines he played.
+
+In a formal expression, the slot machines stand for $k$ distributions
+$D_1, D_2, \ldots, D_k$, which with $\mu_i,\mu_2,\ldots,\mu_k$ as
+expectation values and variances $\sigma_1, \sigma_2,\ldots,\sigma_k$.
+A random variable $X_{i,n}$ is the recorded sampled values in
+distribution $D_i$ and $n$ stands for the time the machine has been
+played.
+For example, $X_{4,5}$ is the 5-th sampled value of $D_4$.
+A popular performance measurement called \emph{expected regret} can be
+defined with respect to a fixed turns $T$ that: \[R_T = T\mu^\star -
+\sum\limits_{t=1}^T \mu_{j(t)},\] where $j(t)$ is a mapping function
+that indicates the index of machine pulled in $t$-th round while
+$\mu^\star$ is the best expectation reward among $k$ distributions.
+Besides, the lower bound of the growing rate for $R_T$ is proved to be
+$\mathcal{O}(\ln{n})$.
+As consequence, the problem aims to find the optimal mapping $t
+\rightarrow j(t)$ to minimize $R_T$, and a solution can be considered
+appropriate for solving exploration-exploitation trade-off if the policy
+makes the growth rate of \emph{expected regret} is within a constant
+factor of the lower bound.
+
+\subsubsection{Related Approach}
+
+We have to design an adaptive sampling strategy, based on the previous
+observed samples, to select an arm at each round.
+We are going to introduce a solution named \emph{upper confidence bound}
+(UCB) proposed by Auer et al. in 2002, and Auer in 2003.
+UCB algorithms are widely integrated into MAB problems and considered an
+more elegant and simpler implementation when it comes to the uncertainty
+problems.
+The main concept of the UCB family is to reach a balance between average
+reward sampled in $(0,1)$ and the number of times a machine is played.
+That is to say, for $D_1, D_2, \ldots, D_k$, the next distribution we
+tend to sample from should be the one giving better average sample
+reward, but distributions with worse reward are possibly to be chosen
+once they become relatively unknown to the often sampled ones.
+In other words, the way to design the algorithm is to give a measurement
+combining average reward and the number of sampled times for each
+distribution. 
+
+Algorithm \emph{UCB1} is a simple way to combine the factors and is
+proved to achieve logarithmic \emph{expected regret} over $n$ without
+any preliminary knowledge about the distributions.
+The combination can be formulated as sum of the two terms as following
+when considering machine $j$: \[\bar{x_j} +
+\sqrt{\frac{2\ln{n}}{n_j}},\] where $\bar{x_j}$ is the average of
+rewards obtained in $D_j$ so far, $n$ is the total round the system has
+sampled and $n_j$ is the total round for distribution $D_j$.
+Thus, the optimal mapping is in the following form: \[j(t) = \arg\max_{i
+\in \{1,2,\ldots,k\}}\bar{x_i} + \sqrt{\frac{2\ln{n}}{n_i}}.\]
+
+Along with \emph{UCB1}, the author proposed another algorithm which adds
+an extra element into \emph{UCB1}, and claimed better performance in
+practice, although without any theoretical guarantee.
+The newly proposed algorithm `\emph{UCB1-tuned}' is a modification of
+\emph{UCB1} which takes not only average reward, but the variance of
+each distribution observed so far into account.
+The usage is to replace the confidence bound
+\emph{$\sqrt{2\ln{n}/{n_j}}$} with another term composed of variance.
+Thus the modified formulation can be expressed as:
+\[\bar{x_j} + \sqrt{\frac{\ln{n}}{n_j} \min(\frac{1}{4},V_j(n_j))},\]
+where $V_j(t) =\sigma_j^2 + \sqrt{\frac{2\ln n}{n_j}}$.
+
+In conclusion, MAB problem is a template to describe the situation when
+facing a uncertain problem with multiple distributions, and we would
+like to evolve some strategy in order to minimize the degree of
+regretfulness.
+Among the solutions to MAB problems, UCB provides an intuitive solution
+to illustrate the trade-off between exploration and exploitation.
+Each round the recorded $\bar{X_j},\sigma_j,n_j$ contribute to the
+measurement indicating which lever to pull.
+According to the formulation, we can roughly tell that the choosing
+strategy focuses on selecting a better $X_j$ or a less emphasized arm
+with little $n_j$.
+The 2-layer CMA-ES proposed in the previous section lacks the capability
+of elitism.
+In next section, we proposed an approach to model the problem in the
+form of MAB problem.
+Once we successfully mapped the problem, \emph{UCB1-tuned} is then
+adopted to conquer the trade-off between exploration and exploitation
+between groups.
+
+\subsection{Methodology}
+
+Recall that our approach is about discretization.
+However, different from rECGA with SoD, this work aims to remain
+possible division so that it can extract information between distributions
+to reach the cliff.
+On the other hand, rECGA with SoD tries to figure out the region where
+global optimum exactly is.
+As a result, we have to maintain a number of groups simultaneously where
+the number is defined with respect to the population size according to
+rule of thumb in \emph{k-means} clustering.
+
+To transfer our hypothesis into a MAB problem, we can first regard $k$
+groups as bandits.
+A pull action is then an execution of CMA-ES with a specific number of
+generation, and replacement occurs if the generated solutions is better
+than the worst in the original group.
+The representative solutions for groups and the method to evolve a
+better solution according to selected candidates are the same to the
+originally proposed 2-layer CMA-ES.
+Under this assumption, we almost finished the transformation from the
+assumption that better groups should be concentrated on to a MAB problem
+introduced in the previous section.
+
+However, the method meets a problem.
+According to the proposed transformation, if the generation is given a
+large number, as a result of the quick-convergence ability of CMA-ES,
+the group may converge in the early stage.
+Under this circumstance, we benefit nothing from the optimal pulling
+sequence obtained by UCB because this does identical effort to the
+original 2-layer CMA-ES since both use local optima as representative
+solutions of groups, and thus the priority makes no sense.  
+
+To overcome the difficulty and take advantage from the concept of
+evolving groups, we can first adjust the number of generation to a
+proper one in order to avoid a premature convergence.
+Besides, the problem that priority makes no sense in the late stage is
+not solved.
+Since our system tried hard to maintain the diversity and the
+transformation prepared above is insufficient to extract more
+information than a pure 2-layer CMA-ES, we have to add some extra
+modification.
+The idea to overcome the problem is to design a policy that drop off
+some groups that seem to contribute little or nothing to the overall
+system.
+After abandoning a group, we regard the solution generated by the $k-1$
+representative solutions as a generator to form a new group by uniformly
+generating solutions nearby.
+By iteratively checking and replacing useless groups, we can keep
+diversity along with taking advantage from the information evolved from
+groups. 
+
+In our modified system, the described \emph{UCB1-tuned} is integrated as
+the policy for generating optimal pulling sequence.
+However, the original form of \emph{UCB1-tuned} aims to find the maximal
+$\bar{X_j}$ at each round.
+On the other hand, our goal is to minimize the function value, so we
+have to do some change to deal with the different target.
+Since minimizing $\bar{X_j}$ is identical with maximizing $-\bar{X_j}$,
+our demanding form should be rewritten as $ -\bar{X_j}
++\sqrt{\frac{\ln{n}}{n_j} \min(\frac{1}{4},V_j(n_j))}$.		
+
+At last, we are performing the measurement of criteria to delete group.
+The criteria are based on the idea that a group have to be abandon if
+(1)the group has reached the local optimum of the region or (2)the group
+is ignored for a long time.
+The first criterion is easy to detect by a constant space requirement.
+The second, however, is not theoretically defined according to an
+informal assumption that the number of generation a group being ignored
+should not exceed the number of solutions it consists of.
+
+
+
+
+\begin{algorithm}[H] \caption{MAB-based CMA-ES} \KwIn{$n$,$t$ as a
+	proper generation for each pulling action}
+	\KwOut{best solution ever evolved} Uniformly sampled population of
+	size $n$\; $k = \sqrt{\frac{n}{2}}$\; Integrating \emph{k-means}
+	with \emph{Frogy-method} to cluster the $n$ individuals into $k$
+	groups as known as bandits\; $C\leftarrow$ array with size $k$\;
+	\For{i = 1 to k}            { pull($i$)\; $C_i\leftarrow$ best
+	solution\; } \While{not terminated} { \For{i = 1 to k} {
+			calculateUCB($i$) \tcp*[r]{calculate modified UCB1-tuned as
+			illustrated above} record the index with max value in $M$\;
+
+		} pull($M$)\;				$C_M \leftarrow$ best solution in
+	group$_M$\; update()\; }
+\end{algorithm}	
+
+Comparing to the original 2-layer CMA-ES, this algorithm is featured in the
+updating procedure.  From the flow of algorithm we can tell that an iteration
+for the while loop is one round we refer to in MAB problem.  Each time a lever
+is selected and pulled, the overall system faces a update. The
+update checks in a random order if
+any group meets any deletion criterion.  Assume a group $G$ is decided to be
+destroyed,  we first generate a new solution $I$ as  a new group according to the local
+optima without optimum of $G$, and we uniformly sample around $I$ to fill up the newly generated
+group.  After a new group finishes constructing, the to-be-deleted group is then
+replaced by the new group. The deletion occurs at most once a round,
+and does nothing if no group meet deleting criteria. The update
+procedure is outlined as following:
+
+\begin{algorithm}
+  Initial $P\leftarrow $ a permutation array from $1$ to $k$\; 
+  ToBeDeleted = $0$\;
+	\For{i = 1 to k} 
+  {
+    \If{deleting criterion 1 is met in group$_{P_i}$} 
+    {
+	    ToBeDeleted = $P_i$\; 
+    }  
+
+   }
+   \If{ToBeDeleted = 0} 
+   {
+     \For{i = 1 to k} 
+      {
+				\If{deleting criterion 2 is met in group$_{P_i}$}
+        {
+	        ToBeDeleted = $P_i$\;
+        } 
+      } 
+    } 
+    \If{ToBeDeleted = 0} 
+    { 
+      return\; 
+    } 
+    \Else
+  	{ 
+      $s\leftarrow$ ToBeDeleted\; 
+      generate a new solution as a new group	denoted as $group^\star$ according to $C_1, C_2,\ldots, C_{s_{i-1}}, C_{s_{i+1}},\ldots, C_k$ \; 
+      \For{i = 1 to	$\|group_{s}\|-1$} 
+      { pull($group^\star$) without replacing worst\; }
+	replace $group_{s}$ with $group^\star$\; return\; 
+} 
+\caption{update}
+\end{algorithm}
+
+For further analysis, a newly generated group is with a small
+number of times $n_j$ it has been pulled, thus the system tends to
+pull this since smaller $n_j$ contributes more in the
+bound value. As a result, if the implicit information is correctly
+extracted, the evolution path of the 2-nd layer CMA-ES should be
+driven to a better direction.  
+
+In summary, this chapter provides two kinds of implementation for
+the hypothesis given in the previous chapter. We adopt a clustering
+method in order to maintain diversity of the population and further
+investigate if there is a strategy to evolve not only in individuals
+but in groups. The first implementation only examines the ability to
+maintain a diversity if we apply \emph{k-means} clustering method. A
+test to evolve the local optima of groups is given in order to
+distinguish the existence of information hided among local optima.
+In the second approach, we further investigate if information is
+hided among the distributions. As a result, we control the speed of
+the convergence and integrate UCB as an index to select a group to
+evolve each round. The test case and experiment result are
+introduced in the next chapter.

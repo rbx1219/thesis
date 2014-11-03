@@ -1,0 +1,47 @@
+\chapter{Conclusion} \label{ch:conclusion}
+
+In this work, a discretization framework for enhancing CMA-ES in a
+rugged environment is proposed.
+Different from traditional discretization approaches, such as FHH,
+FWH, execute with fixed settings to address the discretization,
+our work defines a self-adaptive method to achieve a soft
+discretization.
+The motivation is to deal with the difficulty that CMA-ES being an
+outstanding local optimizer is easily trapped in non-convex, rugged
+problems.
+We are first inspired from the method commonly applied in evolutionary
+algorithms which keeps diversity by maintaining a larger population.
+Thus a modification on CMA-ES is needed since the original design of
+CMA-ES is affected little by a large population size. 
+The proposed MAB-based CMA-ES is an implementation features in splitting
+large population into groups and evolving the implicit information among
+groups.
+The results in the test problems show that our approach is stabler even
+in rugged fitness landscape comparing to rECGA, which is addressed by a
+well-known improved discretization method, SoD.
+On the other hand, we can obtain high resolution results once the
+position of the global optimum is roughly located.
+The comparison of the two algorithms is given in the previous chapter.
+In the aspect of exploration, both do not dominate the other since they
+solve some function while the other one is not able to reach the valley
+during the given number of function evaluations.
+To be brief, considering the best error values in the 25 runs of 25
+problems, our algorithm wins in 14 problems and loses in 4.
+Furthermore, considering the median error values, our algorithm wins in
+18 problems while loses in 4.
+
+In conclusion,this describes that our work properly performed in the
+trade-off between exploration and exploitation.
+By maintaining a huge population along with proper selection strategy,
+we can further enhance the famous optimizer `CMA-ES' to gain more
+diversity, which it originally lacks of. 
+An implicit information exists between the distributions so that we can
+obtain stabler results elegantly.
+
+Although the design of our approach is still in early stage since the
+deletion criteria, the number of generation for each pulling, etc.
+is roughly demonstrated, the result achieved in this work presents a
+possible way for developing soft discretization.
+The improvement of designing more robust strategies for deleting
+criteria and tuning parameters is expected.
+

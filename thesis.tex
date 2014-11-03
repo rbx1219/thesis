@@ -1,0 +1,65 @@
+\documentclass[a4paper, 12pt, oneside]{book}
+
+\usepackage{ntu}
+%add your own packages here
+\usepackage{graphicx}
+\usepackage{amsfonts}
+\usepackage[linesnumbered,boxed,ruled]{algorithm2e}
+\usepackage{epstopdf}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\graphicspath{{./img/}}
+\DeclareGraphicsExtensions{.eps,.jpeg,.png}
+
+\setcounter{tocdepth}{2}
+
+\pagestyle{plain}
+
+\begin{document}
+\baselineskip=24pt
+% cover page
+\maketitle
+% side page, used for printing on spline.
+\makeside
+
+\frontmatter
+ 
+\begin{CJK}{UTF8}{bkai}
+\CJKhorz
+\makecertification
+
+% comment one of the following unless you are sure you want to 
+% have both english and chinese acknowledgements in your thesis
+\input{acknowledgementsEN}
+% \input{acknowledgementsCH}
+
+\input{abstractCH}
+\input{abstractEN}
+\tableofcontents
+\end{CJK}
+\listoffigures
+\listoftables
+\listofalgorithms
+\mainmatter
+
+% input your thesis here
+\input{introduction}
+\input{real-valued_function_optimization}
+\input{Approaches_for_real-valued_function}
+%\input{Background}
+\input{Methodology}
+\input{Experiment}
+\input{conclusion}
+
+\backmatter
+
+\addcontentsline{toc}{chapter}{\bibname}
+\bibliographystyle{abbrv}
+
+% input your reference here
+\bibliography{thesis}
+
+\appendix
+
+\end{document}
+ 

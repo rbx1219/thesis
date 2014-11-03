@@ -1,0 +1,430 @@
+\chapter{Experiment}
+\label{ch:experiment}
+
+In this chapter, we demonstrate the capability of our system by applying the
+proposed algorithm into a set of test problems. In~\ref{sec:test problem}, we introduce a set of test problems for real-valued function optimization. The settings for the parameters and the results are shown in ~\ref{sec:experiment}. At last, we discuss about the phenomena obtained from the results in ~\ref{sec:discussion}.
+
+
+\section{25 benchmark problems}
+\label{sec:test problem}
+To measure the performance comparing to other discretization methods, a set of
+test function is demanded. As discussed in %J. J. Liang, P. N. Suganthan, and
+%K.Deb, “Novel composition test functionsfor numerical global optimization,” in
+%Proc. IEEE Swarm Intell.Symp., Pasadena, CA, Jun. 2005, pp. 68–75.
+, many benchmark functions commonly suffer from several properties. We indicate
+two important ones of them and give an instance to illustrate. First, global
+optimum usually lies in the center of the search space. This property is taken
+advantage by the design of algorithms with strong assumption to explore the
+center of the domain. For example, the global
+optimum of the test function given below are just in the center of search space. 
+\[f(\mathbf{x}) = \sum\limits_{i=1}^d{x_i}^2,\]
+where $\mathbf{x}$ is a vector composed of $(x_1, x_2,\ldots, x_d)$, $d$ is the
+number of dimensions and $x_i \in (-5.12,5.12),\forall i \in \{1,2,\ldots,d\}$.
+
+Second, local optima are
+put along coordinate axes. In other words, there are no linkage between the
+variables, hence the benchmark function is lack of the examination for  the ability to extract
+linkage information between variables. For example, the formulation given below
+consists of no dependency and global optimum can be easily extracted from local
+optima
+\[f(\mathbf{x}) = -\sum\limits_{i=1}^n{x_i},\]
+where $\mathbf{x}$ is a vector composed of $(x_1, x_2,\ldots, x_d)$, $d$ is the
+number of dimensions and $x_i \in (-5.12,5.12),\forall i \in \{1,2,\ldots,d\}$.
+
+As a result, the design of the benchmark problems should at least consists of two
+abilities.
+\begin{itemize}
+	\item The ability to shift\\
+		This property gives an offset $\mathbf{o} = \mathbf{o_{new}} -
+		\mathbf{o_{old}}$, where $\mathbf{o_{new}}$ is the new position of global optimum
+		and $\mathbf{o_{old}}$ is the old one. In practice, the function
+		evaluation is transformed from $f(\mathbf{x})$ to $F(\mathbf{x}) =
+		f(\mathbf{x} - \mathbf{o})$. Note that the global optimum should not be
+		shifted to the outside of the search space.
+	\item The ability to rotate\\
+		This property is introduced with an orthogonal matrix $\mathbf{M}$. The function
+		evaluation is transformed to $F(\mathbf{x}) = f(\mathbf{Mx})$. Under the
+		transformation, the local optima no longer put along the axes.
+\end{itemize}
+
+The benchmark problems proposed in CEC 2005 (Suganthan et al., 2005)
+provides a set of problems without the disadvantages illustrated above.
+The 25 functions given in the paper is categorized into several types, which are
+\emph{Unimodal functions}, \emph{Basic multi-modal functions}, \emph{Expanded functions} and \emph{Hybrid composition functions}. Evaluation criteria are also introduced to measure the performance of algorithms. 
+Function 1, 2, \ldots, 5 are unimodal functions, and the first two are easy to obtain high resolution solutions. Function 3 and Function 5 are easy to move to the peak with a strong local optimizer. Function 4 is similar to Function 2 except that the former produces a perturbation by multiplying a noise factor $(1+0.4N(0,1))$. 
+Function 6-14 are basic and expanded multi-modal problems. Among the 9
+problems, Function 8 is the so-called `Needle-In-A-Haystack' problem, which we can only obtain global optimum if the population is initialized around it. 
+Function 15-25 are composites of 10 basic functions, which are big challenges to search algorithms.
+
+
+\section{Experiment settings and results}
+\label{sec:experiment}
+
+For describing abilities of generating better solutions, we set the number of
+function evaluations to be $10^6$. 
+That is to say, during each optimization we evaluate the function
+exactly $10^6$ times. 
+The best solution ever obtained is recorded after each run.
+25 runs are executed for each problem, and the results are recorded and
+sorted so that we can obtain the best, median and worst result of the 25
+runs. 
+
+For each problem, there is a table of fixed accuracy for each problem.
+The accuracy is used to determine whether a candidate is close enough to
+the global optimum.
+Giving $\mathbf{x^\star}$ as the global optimum for function $i$, a solution
+$\mathbf{x}$ is considered reaching the global optimum if $f_i(\mathbf{x}) -
+f_i(\mathbf{x^\star}) < accuracy_i$. 
+The table is given in Table~\ref{table:accuracy}.
+
+\begin{table}
+\centering
+\begin{tabular}{c|c}
+Function & Accuracy \\\hline
+1-5      &  $1E-6$  \\\hline
+6-16     &  $1E-2$  \\\hline
+17-25    &  $1E-1$  \\
+\end{tabular}
+\caption{Accuracy value for each test function}
+\label{table:accuracy}
+\end{table}
+
+The design of our algorithms are 2-layer CMA-ES and MAB-based CMA-ES.
+The first aims to examine the advantage by clustering individuals
+into groups.
+The second describes that based on the clustering, we develop a soft
+discretization by adaptively, iteratively replace a group to explore finer region
+for better convergence value.
+Therefore, we would like to examine things which:
+\begin{enumerate}
+  \item{2-layer CMA-ES increases the diversity}
+  \item{MAB-based CMA-ES further increases the ability of searching}
+  \item{MAB-based CMA-ES performs comparable to other discretization
+    method}
+  \end{enumerate}
+The method we examine the abilities is first applying the algorithm to
+the set of benchmark problems. For each problem, Our system records
+the best solution ever found in each run. After 25 runs, the error
+values, $f(\mathbf{x}) -f(\mathbf{x^\star})$, of each record is then
+calculated.
+At last, the 25 error values are sorted, and the best value, median
+value, worst value along with mean value are highlighted to represent
+the ability of the algorithm executing on the problem. Note that a
+better solution is suggested to be with a smaller error value.
+Note that our system uses the double-precision floating-point format to
+represent the error value, and we can obtain from the definition that a
+double-precision variable shows up to 15 decimal digits of precision.
+As a result, the entry given `1E-15' means the resolution of the error
+value is beyond expression because it is too small.   
+
+
+As a consequence, to check the existence of diversity incremental,
+we provide two tables for error values. The first one is the evaluation
+results of original CMA-ES while the second is the results of the pure
+2-layer CMA-ES.
+Table~\ref{table:errorCMAES} is the evaluation results of CMA-ES
+according to the following settings that:
+\begin{itemize}
+  \item{$\lambda = 20$, $\mu = 10$}
+  \item{initial step size $\sigma$ = 1}
+  \item{random vector in the search space as initial $m$}
+\end{itemize}  
+\begin{table}[h]
+\footnotesize
+  \centering
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+Function&1       &2       &3       &4       &5       &6       &7     \\ \midrule
+Best    &1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15 \\
+Median  &1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15\\
+Worst   &1.00E-15&1.00E-15&1.00E-15&1.41E+05&3.64E-12&3.99E+00&1.72E-02\\
+Mean    &1.00E-15&1.00E-15&1.00E-15&6.28E+03&4.37E-13&3.19E-01&5.81E-03\\\midrule
+Function&8       &9       &10      &11      &12      &13      &14      \\\midrule
+Best    &2.00E+01&1.99E+00&2.98E+00&1.00E-15&1.00E-15&6.00E-01&4.07E+00\\
+Median  &2.00E+01&5.97E+00&6.96E+00&1.00E-15&2.09E+01&1.03E+00&4.75E+00 \\
+Worst   &2.13E+01&1.59E+01&1.19E+01&1.50E+00&1.06E+04&2.11E+00&5.00E+00\\
+Mean    &2.01E+01&6.96E+00&7.20E+00&3.42E-01&1.54E+03&1.09E+00&4.71E+00\\\midrule
+Function&15      &16      &17      &18      &19      &20      &21\\\midrule
+Best    &1.02E+02&8.73E+01&9.69E+01&3.00E+02&3.00E+02&3.00E+02&3.00E+02\\
+Median  &3.00E+02&1.22E+02&8.00E+02&8.00E+02&8.00E+02&9.53E+02&8.00E+02\\
+Worst   &9.00E+02&9.84E+02&1.02E+03&9.95E+02&1.02E+03&1.01E+03&1.24E+03\\
+Mean    &3.61E+02&2.26E+02&3.20E+02&8.02E+02&5.51E+02&8.80E+02&8.78E+02\\\midrule
+Function&22      &23      &24      &25&&&\\\midrule
+Best    &7.35E+02&5.56E+02&2.00E+02&4.07E+02&&&\\
+Median  &7.54E+02&1.09E+03&2.00E+02&4.09E+02&&&\\
+Worst   &8.00E+02&1.28E+03&9.00E+02&5.00E+02&&&\\
+Mean    &7.68E+02&1.04E+03&3.28E+02&4.12E+02&&&\\\bottomrule
+\end{tabular}
+\caption{Error values for CMA-ES on function 1-25 with $10^6$ function evaluations}
+\label{table:errorCMAES}
+\end{table}
+
+In comparison with the original CMA-ES, 2-layer CMA-ES adds extra
+mechanism to increase diversity, and the results of evaluations is given
+in Table~\ref{table:2layercmaes}.
+The settings are as follows:
+\begin{itemize}
+  \item{for each CMA-ES to be executed, $\lambda = 20$,
+      $\mu=10$, $\sigma$ initialize to $1$}
+  \item{for each inner CMA-ES, set $t$ = 1000 as the generation of each
+    group}
+  \item{an efficiently large population size $n$ = 450}
+  \end{itemize}
+
+\begin{table}[h]
+\footnotesize
+  \centering
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+Function&1       &2       &3       &4       &5       &6       &7     \\ \midrule
+Best    &1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15 \\
+Median  &1.00E-15&1.00E-15&1.00E-15&1.00E-15&3.64E-12&1.00E-15&1.00E-15\\
+Worst   &1.00E-15&1.00E-15&1.00E-15&2.82E+04&7.28E-12&3.99E+00&2.46E-02\\
+Mean    &1.00E-15&1.00E-15&1.00E-15&4.06E+03&3.20E-12&1.59E-01&4.83E-03\\\midrule
+Function&8       &9       &10      &11      &12      &13      &14      \\\midrule
+Best    &2.00E+01&1.99E+00&1.99E+00&1.00E-15&1.00E-15&3.27E-01&3.86E+00\\
+Median  &2.10E+01&5.97E+00&5.97E+00&1.00E-15&4.22E+02&9.30E-01&4.59E+00 \\
+Worst   &2.14E+01&9.95E+00&1.39E+01&2.39E+00&1.06E+04&1.79E+00&4.99E+00\\
+Mean    &2.08E+01&6.25E+00&6.65E+00&4.23E-01&3.14E+03&1.01E+00&4.56E+00\\\midrule
+Function&15      &16      &17      &18      &19      &20      &21\\\midrule
+Best    &9.87E+01&9.56E+01&1.03E+02&3.00E+02&3.00E+02&3.00E+02&3.00E+02\\
+Median  &4.00E+02&1.11E+02&1.32E+02&9.40E+02&9.47E+02&9.42E+02&8.00E+02\\
+Worst   &9.00E+02&9.00E+02&1.02E+03&1.01E+03&1.01E+03&9.99E+02&1.25E+03\\
+Mean    &4.13E+02&2.51E+02&4.25E+02&8.57E+02&8.84E+02&8.45E+02&8.76E+02\\\midrule
+Function&22      &23      &24      &25&&&\\\midrule
+Best    &7.27E+02&5.54E+02&2.00E+02&3.95E+02&&&\\
+Median  &7.49E+02&1.09E+03&2.00E+02&3.96E+02&&&\\
+Worst   &8.02E+02&1.27E+03&9.00E+02&5.00E+02&&&\\
+Mean    &7.64E+02&1.04E+03&3.48E+02&4.05E+02&&&\\\bottomrule
+\end{tabular}
+\caption{Error values for 2-layer CMA-ES on function 1-25 with $10^6$ function evaluations}
+\label{table:2layercmaes}
+\end{table}
+
+As a modification of 2-layer CMA-ES, MAB-based CMA-ES being a softer
+discretization method takes advantage from maintaining an outer CMA-ES
+to ceaselessly exploring a finer regions for better solutions.
+For observing implicit information among groups, the modified algorithm
+keeps a slower convergence in order to make difference with the previous
+approach, which observe only implicit information among local optima.
+The settings are as follows:
+\begin{itemize}
+  \item{for each CMA-ES to be executed, $\lambda = 20$,
+      $\mu=10$, $\sigma$ initialize to $1$}
+  \item{for each inner CMA-ES, set $t$ = 30 as the generation of each
+    group}
+  \item{an efficiently large population size $n$ = 450}
+\end{itemize}
+
+
+\begin{table}[h]
+\footnotesize
+  \centering
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+Function&1       &2       &3       &4       &5       &6       &7     \\ \midrule
+Best    &1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15 \\
+Median  &1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15&1.00E-15\\
+Worst   &1.00E-15&1.00E-15&1.00E-15&3.18E-06&1.00E-15&1.19E-03&1.48E-02\\
+Mean    &1.00E-15&1.00E-15&1.00E-15&2.65E-05&1.00E-15&4.78E-05&1.28E-03\\\midrule
+Function&8       &9       &10      &11      &12      &13      &14      \\\midrule
+Best    &2.00E+01&1.99E+00&1.99E+00&1.00E-15&1.00E-15&3.39E-01&3.43E+00\\
+Median  &2.00E+01&3.98E+00&3.98E+00&1.00E-15&1.00E-15&5.79E-01&4.27E+00 \\
+Worst   &2.04E+01&9.95E+00&7.96E+00&1.07E+00&1.56E+03&4.56E+00&4.56E+00\\
+Mean    &2.01E+01&4.74E+00&4.18E+00&8.53E-02&1.21E+02&6.71E-01&4.14E+00\\\midrule
+Function&15      &16      &17      &18      &19      &20      &21\\\midrule
+Best    &7.72E+01&5.61E+01&4.23E+01&3.00E+02&3.00E+02&3.00E+02&3.00E+02\\
+Median  &1.14E+02&9.86E+01&1.01E+02&3.00E+02&5.00E+02&3.00E+02&5.00E+02\\
+Worst   &4.00E+02&1.34E+02&1.23E+02&9.50E+02&9.84E+02&9.58E+02&8.00E+02\\
+Mean    &1.35E+02&9.52E+01&9.80E+01&5.20E+02&5.51E+02&5.15E+02&5.27E+02\\\midrule
+Function&22      &23      &24      &25&&&\\\midrule
+Best    &7.30E+02&5.54E+02&2.00E+02&4.03E+02&&&\\
+Median  &7.67E+02&5.59E+02&2.00E+02&4.04E+02&&&\\
+Worst   &8.00E+02&1.19E+03&8.00E+02&4.05E+02&&&\\
+Mean    &7.59E+02&6.75E+02&2.36E+02&4.04E+02&&&\\\bottomrule
+\end{tabular}
+\caption{Error values for MAB-based CMA-ES on function 1-25 with $10^6$ function evaluations}
+\label{table:errorMABcmaes}
+\end{table}
+
+To measure the performance of MAB-based CMA-ES, we introduced a
+well-known discretization method, SoD,  and compare the evaluation
+results. The competition criteria can be the resolution of best results,
+the number of solved functions, the median values, etc. 
+Therefore, the parameter setting of SoD  is given below:
+\begin{itemize}
+  \item{the population size = 250}
+  \item{the probability of crossover is 0.975}
+  \item{the tournament size = 8}
+  \item{the initial density $\gamma$ = 0.5}
+  \item{the decadence factor $\epsilon$ = 0.998}
+  \item{for every 5 generations a local optimizer is adapted}
+  \end{itemize}
+
+
+\begin{table}[h]
+\footnotesize
+  \centering
+\begin{tabular}{@{}cccccccc@{}}
+\toprule
+Function&1       &2       &3       &4       &5       &6       &7     \\ \midrule
+Best    &5.68E-14&5.68E-14&1.14E-13&3.45E-08&1.06E-04&1.71E-13&9.38E-13 \\
+Median  &6.82E-13&1.02E-12&1.25E-12&2.33E-04&1.33E-03&1.24E-11&1.03E-01\\
+Worst   &4.43E-12&1.68E-11&1.93E-04&2.58E-02&1.54E+00&5.54E+01&5.34E-01\\
+Mean    &1.29E-12&2.11E-12&7.72E-06&2.13E-03&8.77E-02&5.77E+00&1.42E-01\\\midrule
+Function&8       &9       &10      &11      &12      &13      &14      \\\midrule
+Best    &2.00E+01&1.71E-13&2.98E+00&5.23E-01&5.68E-14&9.91E-03&2.16E+00\\
+Median  &2.00E+01&6.82E-13&7.96E+00&2.21E+00&1.76E-12&3.85E-01&3.06E+00 \\
+Worst   &2.00E+01&8.01E-12&1.39E+01&5.53E+00&1.56E+03&8.54E-01&4.00E+00\\
+Mean    &2.00E+01&1.33E-12&7.84E+00&2.35E+00&6.39E+01&4.37E-01&2.97E+00\\\midrule
+Function&15      &16      &17      &18      &19      &20      &21\\\midrule
+Best    &2.84E-14&9.43E+01&1.13E+02&3.00E+02&3.00E+02&3.00E+02&3.00E+02\\
+Median  &1.72E-12&1.10E+02&1.25E+02&8.00E+02&8.00E+02&8.00E+02&8.00E+02\\
+Worst   &4.24E+02&1.30E+02&1.73E+02&9.51E+02&9.68E+02&9.28E+02&1.13E+03\\
+Mean    &1.55E+02&1.11E+02&1.30E+02&7.28E+02&6.61E+02&5.86E+02&6.87E+02\\\midrule
+Function&22      &23      &24      &25&&&\\\midrule
+Best    &7.27E+02&5.59E+02&2.00E+02&4.21E+02&&&\\
+Median  &7.40E+02&9.71E+02&2.00E+02&4.40E+02&&&\\
+Worst   &8. 0E+02&1.24E+03&2.00E+02&1.48E+03&&&\\
+Mean    &7.47E+02&8.14E+02&2.00E+02&6.35E+02&&&\\\bottomrule
+\end{tabular}
+\caption{Error values for SoD on function 1-25 with $10^6$ function evaluations}
+\label{table:errorSoD}
+\end{table}
+
+\section{Discussion}
+  \label{sec:discussion}
+
+In this section, we further investigate the results and summarize
+accordingly.
+To give a brief overview firstly, we give a table for recognizing solved
+function for the proposed algorithms along with original CMA-ES and
+rECGA with SoD.
+According to the category given by the benchmark, there are 3 columns
+for unimodal problems, basic multi-modal problems and other difficult
+problems respectively.
+
+\begin{table}
+\centering  
+\begin{tabular}{cccc}
+Algorithm & Unimodal & Basic multi-modal & Expanded and Hybrid \\\hline  
+CMA-ES   & 1,2,3,4,5 & 6,7,11,12 & -- \\
+2-layer CMA-ES & 1,2,3,4,5 & 6,7,11,12 & -- \\
+MAB-based CMA-ES & 1,2,3,4,5 & 6,7,11,12 & -- \\
+rECGA with SoD & 1,2,3,4 & 6,7,9,12 &13,15 \\\hline
+\end{tabular}
+  \caption{The index of solved functions for the algorithms}
+  \label{table:solved}
+
+\end{table}
+
+Table~\ref{table:solved} shows that in unimodal problems, the CMA-ES series algorithms
+are able to reach the global optimum.
+However, function 5 is difficult for rECGA to solve due to the property of
+the function that it is easy to solve if the initial population are
+located at bounds, which rECGA fails to solve due to SoD's feature.
+Besides, CMA-ES series and rECGA solve 4 functions among the 7 basic
+multi-modal problems, while 11 is solvable for the former and 9 for the
+later.
+At last, among 14 difficult problems, CMA-ES series fail to reach
+suitable resolution to conquer the problems, while rECGA success to fix problem
+13 and 15.
+
+First, the comparison between table~\ref{table:errorCMAES} and table
+~\ref{table:2layercmaes} is investigated in the following.
+Among unimodal problems, the best obtained error values are all beyond
+expression in a 64 bits variable. 2-layer CMA-ES performs slightly worse
+than original CMA-ES on median value of function 5.
+We surmise this situation is caused by the insufficient generations for
+each group, but this is still a comparable result with respect to other
+evolutionary algorithms.
+In the remaining multi-modal problems, 2-layer CMA-ES outperforms the original
+CMA-ES in best error values on 8 problems while the original
+wins in 2 problems.
+This confirms our hypothesis that maintaining large population helps to
+increase diversity along with the ability of exploration, and better
+solutions are evolved more efficiently.
+
+Second, we propose a modification on 2-layer CMA-ES, which is referred
+to as MAB-based CMA-ES and able to extract implicit information to
+adjust the distribution of population.
+By comparing table~\ref{table:2layercmaes} and
+table~\ref{table:errorMABcmaes}, the problem of 2-layer CMA-ES which
+suffers from insufficient generations is eliminated on function 5.
+Besides, when taking the best values into consider in the 20 multi-modal
+problems, the 2-layer CMA-ES wins in three problems while the MAB-based
+CMA-ES wins in four.
+To further investigate the best error values, the result indicates that
+the modified approach does not outperform the 2-layer CMA-ES in the
+measurement of exploration.
+However, by considering the median values, the MAB-based CMA-ES
+significantly outperforms the 2-layer CMA-ES in 13 problems, while on the
+other hand the 2-layer CMA-ES wins only in 2 problems.
+This result inspires us that MAB-based CMA-ES is able to maintain the
+ability of keeping diversity in 2-layer CMA-ES and meanwhile provide
+stability.
+The induction can be enhanced by observing the mean error value, the
+MAB-based CMA-ES loses in none of the problems.
+
+Finally, the MAB-based CMA-ES is compared with rECGA with SoD.
+The collection of error values are shown in
+table~\ref{table:errorMABcmaes} and table~\ref{table:errorSoD}
+respectively.
+SoD being an adaptively discretization method improves rECGA
+significantly comparing to traditional methods,FHH and FWH.
+Since we aim to propose a more elegant discretization method by
+considering the implicit information between groups, it is unavoidable
+to put them together for comparison.
+Though it has been shown that MAB-based CMA-ES can solve 9 problems while rECGA
+with SoD is able to solve 10 problems, each of them does not dominate
+the other in the solved problem.
+
+To further compare them, we can first analyze unimodal problems.
+MAB-based CMA-ES being an extension of CMA-ES keeps the well-known ability of local
+optimization, which usually reaches the global optimum in a very high resolution.
+Thus the unimodal problems are considered easy for MAB-based CMA-ES, and
+the results shows that MAB-based CMA-ES can solve function 1, 2, 3 and 5 at
+all time while more than half for function 4.
+On the other hand, SoD also solves function 1, 2 at all time and gives
+comparable results for function 3, 4.
+As we have shown, SoD encounters difficulty in function 5.
+
+Among basic multi-modal problems, it is vague to distinguish which
+performs better when observing the best values.
+As described above, both algorithms do not dominate the other in the
+series of test problem.
+However, we can obtain from the 2 tables that MAB-based CMA-ES
+introduces better median values except function 9. 
+Five of them are smaller even in different magnitude.
+
+Finally in expanded and hybrid problems, our algorithm fails to reach
+the global optima in function 13, 15, in which rECGA with SoD obtains
+high resolution results.
+Among the 13 problems, MAB-based wins in four problems with respect to
+the best values, while rECGA with SoD wins four problems, too.
+Again we lay emphasis on the median values, CMA-ES wins in 8 problems
+while the other one wins in 4 problems.
+According to a better performance of median values in basic multi-modal
+problems and difficult problems, our induction is enhanced that
+MAB-based CMA-ES offers a stabler approach for real-valued function
+optimization.
+
+To sum up, we propose several experiments to show that (1) clustering is
+helpful to increase the diversity of the population comparing to pure
+CMA-ES, (2) the MAB-based CMA-ES offers a stable approach and maintains
+the ability of exploration enhanced by clustering simultaneously and
+(3) MAB-based CMA-ES provides a comparable result with the adaptive
+discretization method, SoD.
+In the best-error-value competition with SoD, MAB-based CMA-ES obtains
+smaller values on 14 problems, while rECGA with SoD wins on 4
+problems.
+Further in median-error-value competition, MAB-based CMA-ES obtains
+smaller values on 18 problems, while the opposite obtains on 5 problems.
+The result provides the evidence that MAB-based CMA-ES is a technique
+that:
+\begin{enumerate}
+\item{Generates high resolution solutions once the global optimum is
+  roughly located}
+\item{Performs stably and compratably to other evolutionary algorithms}
+  \end{enumerate}
+

@@ -1,0 +1,57 @@
+\chapter{Introduction} \label{ch:introduction}
+
+With the rapid development of knowledge and technology, optimization
+techniques are widely applied in various fields, such as curve fitting
+and parameter tuning.  Generally speaking, optimization is the selection
+of a best solution (with regard to some criteria) from a set of
+available candidate solutions.  In this thesis, we focused on
+real-valued function optimization, which stands for minimizing or
+maximizing an objective function value.
+
+In our work, we consider real-valued problems as black-box problems.
+This means we have no information about the internal structure of the
+objective function including analytic form, gradient, etc.  Under this
+unknown problem structure, we focused on finding closest solution to the
+optimal one rather than finding the optimum.
+
+Evolution strategy (ES) is derived from evolution algorithms and
+commonly applied to black-box optimization problems in continuous
+domain; covariance matrix adaptation evolution strategy (CMA-ES) is a
+famous one of ES family.  Covariance matrix is applied by CMA-ES for
+representing current distribution and self-adapted in the end of each
+iteration.  In contrast to other methods, CMA-ES takes fewer assumptions
+on the nature of objective functions since this method only uses
+information of ranking for learning and adapting; even function values
+of candidate solutions are not used by the method.
+
+Unfortunately, CMA-ES faces difficulty on problems of real-valued
+function optimization. Due to several properties of black-box problem,
+multi-modality and uncertainty for example, CMA-ES converges to local
+optima with high probability. For uni-modal problems, CMA-ES is famous
+for ability of \emph{exploitation}, but this property makes CMA-ES
+easily mislead by multi-modal problems.  In order to make CMA-ES more
+feasible on multi-modal problems, this thesis made some modification on
+it.
+
+Our work relied on the hypothesis that we can assume that there are
+multiple local optima when solving a multi-modal problem.
+%The ability of exploitation makes CMA-ES quickly converge to one of
+%local optima.
+Also, we assume that the information of global optimum is hidden among
+local optima.  In other words, there is a hidden relationship between
+local optima and global optimum.  According to the assumptions, we
+evolve the population consisting of local optima in order to fetch the
+hill where global optimum exists.  By applying this 2-layers CMA-ES
+procedure, the modified CMA-ES is expected to improve the ability of
+exploration, and this is just what we lay concentration on.
+
+Here is the organization of the following chapters: in the next section,
+definition and analysis of real-valued function optimization along with
+test problems of our work are presented, approaches for real-valued
+function optimization are introduced in Chapter 2.  The background of
+this work is introduced in Chapter~\ref{ch:real-valued function
+optimization}. Our methodology and related work are introduced in
+Chapter~\ref{ch:method}. Experiment settings and results are introduced
+in Chapter~\ref{ch:experiment}.
+Conclusion is given in Chapter~\ref{ch:conclusion}. 
+

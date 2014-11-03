@@ -1,0 +1,117 @@
+\chapter{Real-valued function optimization}
+\label{ch:real-valued function optimization}
+
+In this chapter, we first briefly introduce basic knowledge for understanding real-valued problem.
+Since this research concentrates on handling real-valued function optimization, we give a formal definition for real-valued function optimization and several examples in section~\ref{sec:problem define}, and then introduce basic knowledge for the optimization problem later in section~\ref{sec:problem difficulty}. 
+
+
+\section{Real-valued problems}
+\label{sec:problem define}
+A real-valued function $f$ can be defined as follows
+
+\[f \colon \mathcal{A} \subset \mathbb{R}^n \to \mathbb{R} , x \mapsto f(x),\] where $x \in \mathcal{A}$ , $f(x) \in \mathbb{R}$.
+
+Under the definition above, real-valued function optimization is to maximize or minimize the function value of $f$.
+Since minimizing $f(x)$ is equal to maximizing $-f(x)$, we take minimization as the representation of real-valued optimization in this thesis, and it can be defined accordingly as \[arg\min_xf(x).\]
+
+Typically, $\mathcal{A}$ is some subsets of the Euclidean space $\mathbb{R}^n$ specified by some constraints that members of $\mathcal{A}$ have to satisfy such as equality and inequality.
+The domain of objective function, $\mathcal{A}$, is called \emph{search space} and the elements of $\mathcal{A}$ are called \emph{candidate solutions}.
+
+A \emph{local optimum} is defined as following:
+ \[\exists x_\ell, \forall x \in \{x\mid \|x-x_\ell\| \leq \delta \},  f(x) \geq f(x_\ell)\] For some sufficiently small $\delta > 0$. \\
+Then $x_\ell$ is referred to as one of local optima of objective function.
+
+A \emph{global optimum} can be similarly defined:
+\[\exists x_g \forall x \in \mathcal{A}, f(x) \geq f(x_g).\]
+Then $x_g$ is referred to as global optimum.
+
+\section{What makes the function difficult to solve}
+\label{sec:problem difficulty}
+Recall that the problems we try to solve are considered as black-box problems.
+Without any interior information like analytic form, it is unable to
+obtain the peak value by mathematical methods.
+Besides, several properties of real-valued function make it hard to optimize.
+They are listed and discussed below.
+
+\subsection{Non-Convex}
+
+Convex function is defined as following:\\ A function $f \colon
+\mathcal{D} \to \mathcal{R}$ satisfy that \[f(t \times x_1+(1-t) \times
+x_2) < t \times f(x_1) + (1-t) \times f(x_2),\] $\forall x_1,x_2 \in
+\mathcal{D},  \forall t \in (0,1)$.\\
+We could tell from the definition that there is only one local optimum
+in a convex function, so this is meanwhile the global optimum.
+Many real-valued functions are multi-modal, which indicates there are
+more than one local optimum, and the functions are therefore not convex.
+The non-convex property makes it hard to distinguish whether the local
+optimum obtained by some procedure is global optimum or not.
+
+\subsection{Dimensionality}
+
+The property of dimensionality points out that in many science problems,
+high-dimensional spaces are usually required.
+In comparison to three-dimensional space in our daily experience, the
+size of the search space increases vastly adding an extra dimension.
+This is the `curse of dimensionality’ brought by Richard Bellman.
+The example of this term from Richard Bellman is illustrated here:
+When sampling 100 points in the one-dimensional domain $[0,1]$, the
+average distance between each point is $10^{-2}$.
+However, if we sample in a 10-dimensional domain $[ 0 , 1 ]^{10}$, it
+requires $\frac{1}{(10^{-2})^{10}}$ = $10^{20}$ points to achieve the
+same sampling density.
+The vast growth of the search space implies the dataset of proper size
+in low-dimensional space will become too sparse in high-dimensional
+space.
+In real-world case, the dimension of objective function is usually more
+than 10, which is referred to as high dimension.
+
+\subsection{Non-separable}
+
+Assume the problem we try to optimize is with n decision variables, separable is defined that if there is a partition for cutting n variables in to $\mathcal{P}$, a set of subsets that:\\
+$\forall \mathcal{A}, \mathcal{B} \in \mathcal{P}, \forall x, y, x \in \mathcal{A} , y \in \mathcal{B}$, x and y have no dependency on the other.\\
+An ideal partition is that:\\
+$\forall \mathcal{A} \in \mathcal{P}, \forall x, y \in \mathcal{A}$, x and y depends on the other.\\
+The advantage of separable problems is dimensionality reduction.
+For instance, to optimize a problem with n = 100 is considerably hard.
+If we can decompose the problem into 25 problems with n = 4 each, or
+even 50 problems with n = 2 each, the search cost decreases
+exponentially.
+Unfortunately, general real-valued optimization problems are
+non-separable, which means we have to do difficult optimization in
+a high dimensional space.
+
+\subsection{Ruggedness}
+
+In a black-box problem, \emph{hill-climbing} method is usually used to
+obtain a local optimum.
+Briefly speaking, hill-climbing is a mutation of current best solution
+trying to get a better one.
+However, in a rugged problem, there are a large amount of local optima
+which probably steep between each.
+Under the circumstances, it is difficult to climb from one local optimum to another.
+Hence, approaches have to be designed to handle the situation that the
+candidate solution is easily trapped in local optima.
+
+\subsection{Ill-conditioned}
+
+Condition number is defined to explain how the function value will be
+affected by a small perturbation on input.
+Typically this is used to measure how sensitive a function is to changes
+on the input.
+A problem is said to be well-conditioned with a small condition number,
+while ill-conditioned problems are the ones with large
+condition-numbers.
+In real-valued functions, being ill-conditioned means the problem has
+high curvature and is sensitive to small changes on input.
+In real world problems, it is common that the condition number of a
+problem is up to $10^{10}$.
+Though using information of gradient is enough to solve a
+well-conditioned problem, it is unavoidable to use second order
+information to conquer a ill-conditioned problem.
+
+To sum up, with the properties described above, the real-world optimization is almost impossible to handle with a greedy method.
+The main reason is the number of local optima is usually large, a greedy approach is always easily trapped in a local optimum due to the property of \emph{non-convex} and \emph{ruggedness}.
+On the other hand, random search does little effort because of the property of \emph{dimensionality} makes the search space huge.
+Without a heuristic, it is too hard to figure out the `Needle in a haystack'.
+
+There are many approaches developed to conquer the hazard, and they vary from eliminating some of the properties in order to generate better solutions. Among the methods the property of \emph{non-convex} is usually challenged and next chapter will give brief overview to two approaches .
