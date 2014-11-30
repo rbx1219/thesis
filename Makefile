@@ -3,7 +3,7 @@
 SRC=*.tex
 all:$(SRC)
 	latex thesis.tex
-#	bibtex thesis.aux
+	bibtex thesis.aux
 	latex thesis.tex
 	latex thesis.tex
 	dvips -o thesis.ps thesis.dvi

@@ -1,0 +1,140 @@
+The 25 benchmark problems are listed below where $D$ is the dimension,
+$z$ is the shifted and sometimes rotated vector, $o$ is the offset and
+$c_1,c_2,\ldots,c_{25}$ is the constant bias values for the 25 problems
+so that it will be hard to guess the minimum.
+$M$ is random orthogonal matrix to ratate the inputs.
+
+\[F_1(x): \sum\limits_{i=1}^D {z_i}^2 + c_1.\]
+\[F_2(x): \sum\limits_{i=1}^D\left(\sum\limits_{j=1}^i z_j\right)^2 +
+c_2.\]
+\[F_3(x): \sum\limits_{i=1}^D\left(10^6\right)^{\frac{i-1}{D-1}} {z_i}^2
++ c_3.\]
+\[F_4(x): \left( \sum\limits_{i=1}^D\left(\sum\limits_{j=1}^i z_j\right)^2\right)
+\times \left(1+0.4|N\left(0,1\right)| \right) + c_4.\]
+
+\[F_5(x): max \{ {A_i}x-B_i \} + f\_bias_5 \quad i = 1,2,\ldots,D
+\quad\text{for given vectors $A$, $B$ }\]
+
+\[F_6(x): \sum\limits_{i=1}^{D-1} \left(
+100\left({z_i}^2-{z_{i+1}}^2\right) + \left(z_i -1 \right) ^2 \right) +
+c_6.\]
+
+\[F_7(x): \sum\limits_{i=1}^D\frac{{z_i}^2}{4000} -
+\prod\limits_{i=1}^Dcos\left(\frac{z_i}{\sqrt{i}}\right) +1 + c_7.\]
+
+\[F_8(x):
+  -20exp\left(-0.2\sqrt{\frac{1}{D}\sum\limits_{i=1}^D{z_i}^2}\right) -
+exp\left(\frac{1}{D}\sum\limits_{i=1}^Dcos\left(2\pi z_i\right)\right)
++20 +e + c_8.\]
+
+
+\[F_9(x): \sum\limits_{i=1}^D\left({z_i}^2 -10 cos\left(2\pi z_i
+\right)+10 \right)+c_9.\]
+
+\[F_{10}(x):\quad\text{Identical to $F_9$ except $z$ is rotated by
+$M$ and $c_9$ is replaced by $c_{10}$.}\]
+
+\[F_{11}(x):
+  \sum\limits_{i=1}^D\left(\sum\limits_{k=0}^{k_{max}}\left(a^kcos\left(2\pi
+  b^k\left(z_i + 0.5\right)\right)\right)\right) -
+  D\left(\sum\limits_{k=0}^{k_{max}}\left(a^kcos\left(2\pi b^k \cdot
+0.5\right)\right)\right) + c_{11},\]\quad\text\\ where $a = 0.5$, $b = 3$,
+$k_{max}=20.$
+
+\[F_{12}(x):\sum\limits_{i=1}^D\left(A_i-B_i\left(x\right)\right)^2+c_{12},\]
+where $A_i =
+\sum\limits_{j=1}^D\left(a_{ij}sin\alpha_j + b_{ij}cos\alpha_j\right)$,
+$B_i(x) = \sum\limits_{j=1}^D\left(a_{ij}sin(x_j) +
+b_{ij}cos(x_j)\right),$\\
+$A$, $B$ are two $D$ square matrix,\\ $a_{ij}$, $b_{ij}$ are integer
+random numbers in the range $[-100,100]$,\\ $\alpha_j$ are random numbers
+in the range $[-\pi, \pi].$
+
+\[F_{13}(x): \sum\limits_{i=1}^Df_7\left(f_2(z_{\left((i-1)\bmod D
++1\right)},
+z_{\left((i-1)\bmod D +2\right)})\right)+c_{13},\]
+where $f_7 = F_7 -c_8$, $f_2 = F_2-c_2,$ $z = x - o + \mathbf{1}.$
+
+\[F_{14}(x):  \sum\limits_{i=1}^Df_{14}(z_{\left((i-1)\bmod D
++1\right)},
+z_{\left((i-1)\bmod D +2\right)}),\]
+where $f_{14}(x,y) = 0.5 + \frac{sin^2\left(\sqrt{x^2+y^2}
+\right)-0.5}{\left(1+0.001(x^2+y^2)\right)^2},$ 
+$z$ is rotated by $M.$
+\\
+$F_{15}$--$F_{25}$ are hybrid functions.
+Giving $n$ basic functions used to construct the composition function, the
+result should be 
+\[F_j(x) = \sum\limits_{i=1}^n\left(w_i \times
+\left(f_{i}^{'}((x-o_i)/\lambda_i * M_i) + c_i\right)\right) + c_j,\]
+where $w_i$ is calculated below:\\$w_i = exp \left(- \frac{\sum\limits_{k=1}^D\left(x_k -
+o_{ik}\right)^2}{2D\sigma_i^2} \right),$\\
+$w_i = \left\{ 
+    \begin{array}{l l}
+          w_i & \quad \text{if $w_i = max(w_i)$}\\
+          w_i*(1-max(w_i)^{10}) & \quad \text{otherwise}
+                \end{array} \right. ,$
+then normalize $w_i = w_i / \sum\limits_{i=1}^nw_i $
+
+\[F_{15}(x): n = 10 ,\quad f_{1-2} = F_9,\quad f_{3-4}= F_{11},\quad f_{5-6} =
+  F_7,\quad
+f_{7-8} = F_8,\quad f_{9-10}= F_1, \]
+where $\sigma_i = 1$,\\$\lambda =
+[1,1,10,10,5/60,5/60,5/32,5/32,5/100,5/100]$,\\$M_i = I$. 
+
+\[F_{16}(x):\text{ identical to $F_{15}$ except $M_i$ are different
+linear transformation matrices.}\]
+
+\[F_{17}(x): (F_{16}(x) - c_{16}) * (1+0.2|N(0,1)|) + c_{17}.\]
+
+\[F_{18}(x): n = 10,\quad f_{1-2} = F_8, \quad f_{3-4} = F_9, \quad
+f_{5-6} = F_1, \quad f_{7-8} = F_{11}, \quad f_{9-10}= F_7,\]
+where $\sigma = [1,2,1.5,1.5,1,1,1.5,1.5,2,2]$,\\$\lambda =
+[10/32,5/32,2,1,10/100,5/100,20,10,10/60,5/60]$,\\$M_i$ are all rotation
+matrices. 
+
+\[F_{19}(x): \text{identical to $F_{18}$}\]
+except $\sigma = [0.1,2,1.5,1.5,1,1,1.5,1.5,2,2]$,\\$\lambda =
+[0.5/32,5/32,2,1,10/100,5/100,20,10,10/60,5/60].$
+
+\[F_{20}(x): \text{identical to $F_{18}$}\]
+except $o_{1(2j)} = 5$, for $j = 1,2,...,\lfloor{D/2}\rfloor.$
+
+\[F_{21}(x): n = 10,\quad f_{1-2} = F_{14}, \quad f_{3-4} = F_9, \quad
+f_{5-6} = F_{13}, \quad f_{7-8} = F_{11}, \quad f_{9-10}= F_7,\]
+where $\sigma = [1,1,1,1,1,2,2,2,2,2]$,\\$\lambda =
+[25/100,5/100,5,1,5,1,50,10,25/200,5/200]$,\\$M_i$ are all orthogonal
+matrices.
+
+\[F_{22}(x): \text{identical to $F_{21}$}\]
+except ${M_i}$'s condition numbers are
+$[10,20,50,100,200,1000,2000,3000,4000,5000]$.
+
+\[F_{23}(x): \text{identical to $F_{21}$}\]
+except 
+$x_j = y_j = \left\{ 
+    \begin{array}{l l}
+      x_j & |x_j -o_{1j} < 1/2|\\
+      round(2x_j)/2 & \quad \text{otherwise}
+                \end{array} \right.,$ for $j = 1,2,\ldots,D$.
+
+\[F_{24}(x): n=10\]
+$f_1 = F_{11},$\\
+$f_2 = F_{14},$\\
+$f_3 = F_{13},$\\
+$f_4 = F_8   ,$\\
+$f_5 = F_9   ,$\\
+$f_6 = F_7   ,$\\
+$f_7 = F{14}$ except that all $x_j$ which $|x_j| >=1/2$ should be
+rounded,\\
+$f_8 = F_9  $ except that all $x_j$ which $|x_j| >=1/2$ should be
+rounded,\\
+$f_9 = F_3,$\\
+$f_{10}= F_1 \times (1+0.1|N(0,1)|).$\\
+$\sigma_i$ = 2\\
+$\lambda = [10,5/20,1,5/32,1,5/100,5/50,1,5/100,5/100],$\\
+$M_i$ are all rotation matrices, condition numbers are
+$[100,50,30,10,5,5,4,3,2,2].$
+
+\[F_{25}(x): \text{identical to $F_{24}$}\]
+except that no giving bound for the candidates.\\

@@ -4,8 +4,8 @@ In previous chapter, the hypothesis of this work is provided.
 This chapter describes how we implemented the system in detail.
 Section~\ref{sec:overview}
 gives a brief overview for the system.
-A pure 2-layer CMA-ES will be described in~\ref{sec:2layer} and a
-modified one will be given in~\ref{MAB-based}.
+A pure 2-stage CMA-ES will be described in Section~\ref{sec:2layer} and a
+modified one will be given in Section~\ref{MAB-based}.
 
 \section{Overview} \label{sec:overview}
 
@@ -45,10 +45,10 @@ A simple flow can be given in Algorithm~\ref{algo:overview}.
 In the following sections, related works about
 division and the method of evaluating second layer will be introduced.
 Section~\ref{sec:2layer}
-gives a simple instance for the system and section~\ref{MAB-based} gives a
+gives a simple instance for the system and Section~\ref{MAB-based} gives a
 modified one.
 
-\section{2-Layer CMA-ES} \label{sec:2layer}
+\section{2-stage CMA-ES} \label{sec:2layer}
 
 To verify the assumption that dividing the population increases the
 diversity, we designed an algorithm in this section. 
@@ -68,14 +68,14 @@ together is essential.
 To split the population into groups according to space locality, the
 coming idea is applying the technique of clustering.
 Many approaches have been proposed in the field of clustering.
-\emph{k-means}, a member of the family of vector quantization, is a
+\emph{k-means}~\cite{hartigan1979algorithm}, a member of the family of vector quantization, is a
 popular skill for cluster analysis in data mining.
 \emph{k-means} aims to partition $n$ observations into $k$ clusters
 where $k < n $.
 Obtaining the best partition without given $k$ and dimension of
 observations $d$ is proved to be computationally difficult (NP-hard).
 As a result, to determine the value of $k$, this thesis takes the rule
-of thumb which sets $k = \sqrt{\frac{n}{2}}$.
+of thumb~\cite{kmeansruleofthumb} which sets $k = \sqrt{\frac{n}{2}}$.
 
 There are some efficient heuristic algorithms to make \emph{k-means}
 converge to a local optimum quickly.
@@ -83,17 +83,19 @@ An iterative refinement approach is provided: \emph{k-means} selects
 out $k$ centroids as the center of $k$ groups.
 Subsequently, every observation are assigned to the center which is closest.
 Before the end of an iteration, the center is updated by the mean of all vectors
-belong to it.A detail formulation can be given as following.
+belong to it.
+A detail formulation can be given as following.
 
 Given a set of observations $\left( x_1, x_2, \ldots, x_n\right)$ where each
 observation is a $d$-dimensional vector, \emph{k-means} clustering aims to
 partition the set into $k$ sets $\mathcal{S} = \{ S_1, S_2, \ldots, S_k \}$ such
 that the sum of the squares within cluster is minimized.
 That is to say, the objective is to find:
-\[arg\min_{\mathcal{S}}\sum\limits_{i=1}^k \sum\limits_{x \in S_i}
-\|x-\mu_i\|\], where $\mu_i$ is the arithmetic mean of vectors in $S_i$.
+\[\argmin_{\mathcal{S}}\sum\limits_{i=1}^k \sum\limits_{x \in S_i}
+\|x-\mu_i\|,\] where $\mu_i$ is the arithmetic mean of vectors in $S_i$.
 
-In this thesis the initialization method is referred to as \emph{Forgy method}.
+In this thesis the initialization method is referred to as \emph{Forgy
+method}~\cite{Forgy65}.
 The overall procedure of the modified \emph{k-means} can be algorithmically
 outlined as Algorithm~\ref{algo:kmeans}.
 
@@ -124,14 +126,14 @@ implement and performs acceptably.
 The characteristic of the algorithm is that it maintains a larger
 population, which is inefficient in the original CMA-ES, so that it may
 obtain better diversity of a real-valued problem.
-Recalled from the flow giving in section~\ref{sec:overview}, 2 criteria
+Recalled from the flow giving in Section~\ref{sec:overview}, 2 criteria
 have not been determined yet: (1) the method to choose representative
 solutions and (2) the timing to switch from bottom layer to the top one.
 In this algorithm, we take the local optima of groups after executing
 CMA-ES for a given generation as the representative solutions.
 Also, a given generation is adopted to control the number of iterations
 for each group.
-The main purpose of this 2-layer CMA-ES is to distinguish the ability of
+The main purpose of this 2-stage CMA-ES is to distinguish the ability of
 division, and roughly evolve the groups to extract the information
 inside.
 Consequently, the remaining criteria are set to be simple so that we can
@@ -139,10 +141,11 @@ verify our assumption directly.
 
 A detail algorithm can be illustrated as following\\
 \begin{algorithm}[H]{
-		\caption{2-layer CMA-ES}
+		\caption{2-stage CMA-ES}
     \KwIn{$n$,$t$}
     \KwOut{best solution ever evolved}
     Uniformly sampled population of size $n$\;
+    Performing selection on the sampled population.
     $k = \sqrt{\frac{n}{2}}$\;
     Integrating \emph{k-means} with \emph{Frogy-method} to cluster the
     $n$ individuals into $k$ groups\;
@@ -172,7 +175,7 @@ expensive, especially when evaluating the objective function is costive.
 
 \section{MAB-based CMA-ES} \label{MAB-based}
 
-The previous section introduces a 2-layer CMA-ES trying to benefit from
+The previous section introduces a 2-stage CMA-ES trying to benefit from
 a large population.
 However, the algorithm does not take group priority into consideration,
 and we wondered if any priority between groups should be claimed.
@@ -182,7 +185,7 @@ solutions.
 Furthermore, we would like to design a mechanism to drop off groups that
 contribute nothing anymore for extracting information between groups.
 
-To sum up, this section introduces a modified version of the algorithm
+This section introduces a modified version of the algorithm
 proposed in the previous section.
 The motivation behind this design is to make the search escape from the
 ruggedness hazard and jump to a better cliff in the search space.
@@ -192,14 +195,14 @@ groups.
 
 \subsection{Multi-armed bandit problems}
 
-Multi-armed bandit (MAB) problems are a class of sequential resources
+Multi-armed bandit (MAB) problems~\cite{vermorel2005multi} are a class of sequential resources
 allocating problems.
 MAB problems are about allocating resources among several competing
 objects, which addresses the priority between competitors, and
 we can model our problem finding regions where better solutions may
 locate as a MAB problem.
 We give detail introduction to the MAB problems and
-integrate the method to modify the proposed 2-layer CMA-ES.
+integrate the method to modify the proposed 2-stage CMA-ES.
 
 \subsubsection{Problem description}
 
@@ -241,7 +244,8 @@ factor of the lower bound.
 We have to design an adaptive sampling strategy, based on the previous
 observed samples, to select an arm at each round.
 We are going to introduce a solution named \emph{upper confidence bound}
-(UCB) proposed by Auer et al. in 2002, and Auer in 2003.
+(UCB) proposed by Auer \textit{et al}. in 2002~\cite{auer2003using}, and Auer in
+2003~\cite{auer2002finite}.
 UCB algorithms are widely integrated into MAB problems and considered an
 more elegant and simpler implementation when it comes to the uncertainty
 problems.
@@ -255,6 +259,8 @@ In other words, the way to design the algorithm is to give a measurement
 combining average reward and the number of sampled times for each
 distribution. 
 
+\newcommand{\argmax}{\operatornamewithlimits{argmax}}
+
 Algorithm \emph{UCB1} is a simple way to combine the factors and is
 proved to achieve logarithmic \emph{expected regret} over $n$ without
 any preliminary knowledge about the distributions.
@@ -263,8 +269,9 @@ when considering machine $j$: \[\bar{x_j} +
 \sqrt{\frac{2\ln{n}}{n_j}},\] where $\bar{x_j}$ is the average of
 rewards obtained in $D_j$ so far, $n$ is the total round the system has
 sampled and $n_j$ is the total round for distribution $D_j$.
-Thus, the optimal mapping is in the following form: \[j(t) = \arg\max_{i
-\in \{1,2,\ldots,k\}}\bar{x_i} + \sqrt{\frac{2\ln{n}}{n_i}}.\]
+Thus, the optimal mapping is in the following form: \[j(t) =
+  \argmax\limits_{i
+\in \{1,2,\ldots,k\}}\left(\bar{x_i} + \sqrt{\frac{2\ln{n}}{n_i}}\right).\]
 
 Along with \emph{UCB1}, the author proposed another algorithm which adds
 an extra element into \emph{UCB1}, and claimed better performance in
@@ -284,12 +291,12 @@ like to evolve some strategy in order to minimize the degree of
 regretfulness.
 Among the solutions to MAB problems, UCB provides an intuitive solution
 to illustrate the trade-off between exploration and exploitation.
-Each round the recorded $\bar{X_j},\sigma_j,n_j$ contribute to the
+Each round the recorded $\bar{X_j}$, $\sigma_j$, $n_j$ contribute to the
 measurement indicating which lever to pull.
 According to the formulation, we can roughly tell that the choosing
 strategy focuses on selecting a better $X_j$ or a less emphasized arm
 with little $n_j$.
-The 2-layer CMA-ES proposed in the previous section lacks the capability
+The 2-stage CMA-ES proposed in the previous section lacks the capability
 of elitism.
 In next section, we proposed an approach to model the problem in the
 form of MAB problem.
@@ -315,7 +322,7 @@ specific number of generation, and replacement occurs if the generated
 solutions is better than the worst in the original group.
 The representative solutions for groups and the method to evolve a
 better solution according to selected candidates are the same to the
-originally proposed 2-layer CMA-ES.
+originally proposed 2-stage CMA-ES.
 By now, we almost finished the transformation from the assumption that
 better groups should be concentrated on, to the MAB problem introduced
 in the previous section.
@@ -324,7 +331,7 @@ Unfortunately, there is a problem with this method.
 According to the proposed transformation, if the generation is given a
 large number, the group may converge in the early stage due to the
 quick-convergence ability of CMA-ES.
-As both 2-layer CMA-ES and the proposed transformed MAB problem use
+As both 2-stage CMA-ES and the proposed transformed MAB problem use
 local optima as representative solutions of groups and thus takes no
 account of priority, they are laying identical effort on the second
 layer evaluation; under this circumstance, we benefit nothing from the
@@ -336,7 +343,7 @@ the number of generation to a proper one.
 %not solved.
 Since our system should maintain the diversity and the
 introduced transformation above is insufficient to extract more
-information than a pure 2-layer CMA-ES, we have to add some extra
+information than a pure 2-stage CMA-ES, we have to add some extra
 modification.
 Our solution to the problem is to design a policy that drops off some
 groups that seem to contribute little or nothing to the overall system.
@@ -376,14 +383,14 @@ should not exceed the number of solutions it consists of.
 	groups as known as bandits\; $C\leftarrow$ array with size $k$\;
 	\For{i = 1 to k}            { pull($i$)\; $C_i\leftarrow$ best
 	solution\; } \While{not terminated} { \For{i = 1 to k} {
-			calculateUCB($i$) \tcp*[r]{calculate modified UCB1-tuned as
-			illustrated above} record the index with max value in $M$\;
+			calculateUCB($i$) \tcp*[r]{calculate modified UCB1-tuned}
+      record the index with max value in $M$\;
 
 		} pull($M$)\;				$C_M \leftarrow$ best solution in
 	group$_M$\; update()\; }
 \end{algorithm}	
 
-Comparing to the original 2-layer CMA-ES, this algorithm is featured in
+Comparing to the original 2-stage CMA-ES, this algorithm is featured in
 the updating procedure.
 From the flow of the algorithm we can tell that an iteration for the while
 loop is one round we refer to in MAB problem.
@@ -399,8 +406,8 @@ After a new group finishes constructing, the to-be-deleted group is then
 replaced by the new group.
 The deletion occurs at most once a round, and does nothing if no group
 meet deleting criteria.
-The update procedure is outlined as following:
-
+The update procedure is outlined as Algorithm~\ref{algo:update}, and the
+overall procedure can be simply illustrated by Figure~\ref{fig:animation}.
 \begin{algorithm}
   Initial $P\leftarrow $ a permutation array from $1$ to $k$\; 
   ToBeDeleted = $0$\;
@@ -435,7 +442,27 @@ The update procedure is outlined as following:
 	replace $group_{s}$ with $group^\star$\; return\; 
 } 
 \caption{update}
+\label{algo:update}
 \end{algorithm}
+
+
+\begin{figure}
+\centering
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width = .8\textwidth]{animation2.eps}
+\end{subfigure}
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width = .8\textwidth]{animation4.eps}
+\end{subfigure}
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width = .8\textwidth]{animation6.eps}
+\end{subfigure}
+\begin{subfigure}{.24\textwidth}
+\includegraphics[width = .8\textwidth]{animation8.eps}
+\end{subfigure}
+\caption{Simple illustration of MAB based CMA-ES}
+\label{fig:animation}
+\end{figure}
 
 For further analysis, a new group is generated with a small number of
 times $n_j$ it has been pulled, and thus the system tends to pull this
@@ -446,6 +473,7 @@ direction.
 
 In summary, this chapter provides two kinds of implementation for
 the hypothesis given in the previous chapter.
+The proposed system can be imagined in Figure~\ref{fig:system}.
 We adopted a clustering method in order to maintain diversity of the
 population and further investigate if there is a strategy to evolve not
 only in individuals but in groups.
@@ -458,3 +486,11 @@ hided behind the distributions.
 We controlled the speed of the convergence and integrate UCB as an index
 to select a group to evolve each round.
 The test case and experiment result are introduced in the next chapter.
+
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[bb = 91 34 678 555, clip, width=0.6\textwidth]{hypothesis_discretization.eps}
+  \caption{System Description}
+  \label{fig:system}
+\end{figure}

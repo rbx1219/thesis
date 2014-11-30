@@ -1,23 +1,31 @@
 \chapter{Conclusion} \label{ch:conclusion}
 
-In this work, a discretization framework for enhancing CMA-ES in a
+In this work, an algorithm with enhanced exploration for improving CMA-ES in a
 rugged environment is proposed.
 Different from traditional discretization approaches executing with
 fixed settings to address the discretization, such as FHH and FWH, our
 work defines a self-adaptive method to achieve a soft discretization.
 The motivation is to tackle the difficulty that CMA-ES is easily to be
-trapped in rugged non-convex problems being an outstanding local
-optimizer.
+trapped in rugged problems as being an outstanding local optimizer.
 We are first inspired from the method commonly applied in evolutionary
 algorithms which keeps diversity by maintaining a larger population.
 However, since the original design of CMA-ES is affected little by a
 large population size, some modification on CMA-ES is required.
-The proposed MAB-based CMA-ES is an implementation which features in
-splitting large population into groups and evolving the implicit
-information among groups.
-The results in the test problems showed that our approach is stabler
-even in rugged fitness landscape comparing to rECGA, which is addressed
-by SOD, a well-known improved discretization method.
+As a result, we integrate $k$-means clustering for dividing the
+population into several groups.
+With $k$ groups and the local optima from each, the important hypothesis
+is that we believe the location where global optimum resides can be
+retrieved from locations of local optima.
+With the hypothesis, we further map our problem into a MAB problem which
+investigates the trade-off between exploration and exploitation.
+At last, we develop criteria to replace the arm which is believed to
+contribute little to the overall system.
+
+Consequently, the proposed MAB-based CMA-ES is an implementation which
+combines CMA-ES, MAB problem and $k$-means clustering.
+The results in the test problems showed that our algorithm is stabler
+even in rugged fitness landscape comparing to rECGA, which is a
+well-known improved discretization method addressed by SOD.
 On the other hand, we can obtain high resolution results once the
 position of the global optimum is roughly located.
 The comparison of the two algorithms is given in the previous chapter.
@@ -41,7 +49,7 @@ diversity, which it originally lacks of.
 Although the design of our approach is still in early stage as the
 deletion criteria, the number of generation for each pulling, etc.\ is
 determined sketchily only, the result achieved in this work presents a
-possible way for developing soft discretization.
+possible way for developing advanced exploration.
 Also, the improvement from designing more robust strategies for
-deleting criteria and tuning parameters can be expected.
+deletion criteria and tuning parameters can be expected.
 

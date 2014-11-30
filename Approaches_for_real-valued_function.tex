@@ -2,8 +2,8 @@
 \label{ch:Approaches-for-real-valued-problem}
 
 This chapter introduces two techniques for real-valued function optimization
-based on evolution computation in~\ref{sec:rECGA} and~\ref{sec:CMA-ES}.
-In~\ref{sec:motivation}, the difficulty of CMA-ES is introduced and the
+based on evolution computation in Section~\ref{sec:rECGA} and Section~\ref{sec:CMA-ES}.
+In Section~\ref{sec:motivation}, the difficulty of CMA-ES is introduced and the
 hypothesis of this thesis to conquer the hazard is then proposed.
 
 Due to the difficulties introduced in the previous chapter, it is considered
@@ -11,7 +11,7 @@ appropriate to apply stochastic algorithms to avoid some of the described
 hazards.  Many approaches has been proposed for real-valued problem
 optimization.  For example, Ant colony optimization (ACO), Bat algorithm (BA),
 Differential evolution (DE).  Among the famous optimization methods, estimation
-of distribution algorithms (EDAs) and evolution strategies (ESs) are two major
+of distribution algorithms (EDAs)~\cite{Pelikan:2012:EDA} and evolution strategies (ESs) are two major
 branches of evolution computation and both have performed well on optimization
 problems.  They will be introduced respectively in this chapter along with
 useful solution to real-valued function optimization. 
@@ -21,7 +21,7 @@ useful solution to real-valued function optimization.
 \label{sec:rECGA}
 
 Real-coded extended compact genetic algorithm (rECGA) is a modification
-of extended compact genetic algorithm (ECGA), which belongs to the
+of extended compact genetic algorithm (ECGA)~\cite{Harik:1999:ecga}, which belongs to the
 family of EDAs.  ECGA being a well-known EDA can only solve problems in
 discrete domain due to the assumption of the problem encoding.  As a
 result, rECGA is interested in the ability of model building in ECGA and
@@ -30,52 +30,99 @@ problems.  The main framework of rECGA is to integrate discretization
 techniques into ECGA so that ECGA can cope with problems in continuous
 domain.  \subsection{EDAs}
 
-The term \emph{linkage} in the genetic algorithm (GA) field illustrates
+The term \emph{linkage} in the genetic algorithm
+(GA)~\cite{Holland:1975}~\cite{Goldberg:1989:ga-book} field illustrates
 the dependency among variables, while \emph{building blocks} (BBs)
 refers to groups of related groups.  Many techniques have been developed
 to cope with the linkage problems since Holland lays emphasis on the
 importance of BBs.  Studies have shown that the scalable performance of
 GA can only be obtained when building block information is already in
-the problem coding or given before or the search.  Therefore, linkage
+the problem coding or given before or the
+search~\cite{thierens1999scalability}.  Therefore, linkage
 learning is the key to make an optimization procedure competent.
 
-EDAs, also called probabilistic model-building genetic algorithms
+EDAs, sometimes also called probabilistic model-building genetic algorithms
 (PMBGAs), are stochastic optimization methods that build models
-explicitly on selected candidate solutions iteratively.  The main
-difference between EDAs and conventional evolution algorithms is that
-other evolution algorithms use implicit models to generate solutions,
-while EDAs construct an explicit model to represent the promising
-population obtained so far and sample new solutions accordingly.  EDAs
-play an important role in optimization problems because the
+explicitly on selected candidate solutions iteratively.
+We perform a selection on population and extract the information of
+selected individuals by building model.
+At the end of each iteration, a new population is generated accordingly.
+The main difference between EDAs and conventional evolution algorithms
+is that other evolution algorithms use implicit models to generate
+solutions, while EDAs construct an explicit model to represent the
+promising population obtained so far and sample new solutions
+accordingly.
+EDAs play an important role in optimization problems because the
 probabilistic model is able to extract previously unknown problem
 information.  Moreover, some advanced EDAs like ECGA, are able to
 further illustrate the linkage information among the decision variables.
 
 EDAs can be algorithmically outlined as Algorithm~\ref{algo:EDA}.
 
+
 \begin{algorithm}
 
-  \label{algo:EDA} \While{termination criteria is not met} { select
-    promising individuals from current population\; build probabilistic
-    model using selected individuals\; \If{model converges} { break\; }
-    sample from the model to generate new individuals\; replace the
-  previous population by the sampled	individuals\; } \caption {EDAs()}
-  Initialize population randomly\; \end{algorithm}
+  \While{termination criteria is not met}{
+  Initialize population randomly\;
+  select promising individuals from current population\; 
+    build probabilistic model using selected individuals\;
+    \If{model converges} { break\; }
+    sample from the model to generate new individuals\;
+    replace the
+    previous population by the sampled	individuals\;
+  } \caption {EDAs()}
+  \label{algo:EDA} 
+ \end{algorithm}
 
 There are many different EDAs using different methods to build
 probabilistic models.  Better-known EDAs are univariate marginal
 distribution algorithm (UMDA), extended compact genetic algorithm
 (ECGA), bayesian optimization algorithm (BOA), etc.
 
-ECGA is proposed by Harik in 1999.  The main concept of ECGA comes from
-that a good probabilistic model inspires good linkage learning.  Based
-on the idea, what should be figured out next is the definition of a good
-probabilistic model.  Here is the procedure for model building in ECGA
+ECGA is proposed by Harik in 1999.
+The main concept of ECGA comes from that a good probabilistic model
+inspires good linkage learning.
+Based on the idea, what should be figured out next is the definition of
+a good probabilistic model.
+The procedure for model building in ECGA is describes as
+Algorithm~\ref{algo:ecga}, and we can further describe the concept in
+Figure~\ref{fig:model building}.
+When building model, we first regard each decision variable as a group.
+By greedily testing if we can better describe the model by merging two
+groups, ECGA keeps finding if there is a better merging.
+In the example, we believe that the joint probability is with the
+following form:
+\[Pr(x_1,x_2,x_3,x_4) = Pr(x_1)Pr(x_2,x_4)Pr(x_3).\]
+In other words, we believe that merging $x_2$ and $x_4$ better describes
+this model.
 
-\begin{algorithm}  \KwData{MPM with $\ell$ groups,each contains one
+The overall procedure of ECGA can be illustrated as Figure~\ref{fig:ecgaflow}.
+Starting from initialization, selection is performed followed by model
+building.
+The offspring are generated according to the model and measurement for
+convergence of offspring takes place.
+If the termination criteria is met, the procedure terminates; otherwise,
+the offspring are used for selection for the beginning of next
+iteration.
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[bb=50 73 777 554, clip, width=.9\textwidth]{ECGA.eps}
+  \caption{Flow of ECGA}
+  \label{fig:ecgaflow}
+\end{figure}
+
+\begin{figure}[htpb]
+  \centering
+  \includegraphics[bb= 32 150 552 450, clip, width =0.4\textwidth]{modelbuilding.eps}
+  \caption{Model Building in ECGA}
+  \label{fig:model building}
+\end{figure}
+\begin{algorithm}  \KwData{MPM with $\ell$ groups, each contains one
   variable, where $\ell$ is the problem size } \While{there is a pair
   which can reduce CCC} { Finding one pair greedily which reduces CCC
     the most \; merge the pair\; } \caption{model building in ECGA}
+    \label{algo:ecga}
   \end{algorithm}
 
 However, ECGA proposed by Harik focuses on bitstring problems while
@@ -90,7 +137,9 @@ locate.  The template of integrating the discretization method into ECGA
 is the so-called real-coded extended compact genetic algorithm (rECGA).
 Two traditional discretization methods are introduced in the following
 section, and a modified one along with the integration into ECGA is
-introduced in Section~\ref{sec:SoD}.  \subsection{FHH and FWH}
+introduced in Section~\ref{sec:SoD}.
+
+\subsection{FHH and FWH}
 
 The concept of discretization is the segmentation of the continuous
 domain, $(u,l)$.  By giving $k-1$ boundaries, the continuous domain is
@@ -103,7 +152,7 @@ in $bin_i$ are mapped to the index $i$.
 
 
 \begin{figure}[h] \begin{center}
-    \includegraphics[scale = 0.5]{FHH.eps}
+    \includegraphics[bb = 144 82 686 502, clip, scale = 0.5]{FHH.eps}
     \caption{Population distribution generations by generations in FHH}
     \label{fig:FHH} 
   \end{center} 
@@ -111,7 +160,7 @@ in $bin_i$ are mapped to the index $i$.
 
 Giving a fixed bin number, $k$, two traditional methods of
 discretization are fixed height histogram (FHH) and fixed width
-histogram (FWH).
+histogram (FWH)~\cite{tsutsui2001evolutionary}.
 The first splits the domain according to the solution number within a
 bin.
 In other words, each region should be with the same number of solutions.
@@ -132,7 +181,7 @@ the width to reach a high resolution.
 Nevertheless, FHH still maintains the same number of solutions in each
 bin in order to avoid losing diversity. \\
 \begin{figure}[h] \begin{center}
-    \includegraphics[scale = 0.5]{FWH.eps}
+    \includegraphics[bb = 144 82 686 502, clip, scale = 0.5]{FWH.eps}
     \caption{Population distribution generations by generations in FWH}
     \label{fig:FWH} 
   \end{center} 
@@ -155,9 +204,10 @@ Furthermore, a region never condenses is hard to reach high resolution
 results.
 
 \subsection{SoD} \label{sec:SoD} To make it compatible with real-valued
-function optimization problems, in 2006, Chao-Hong Chen et al.\ proposed
-the real-coded extended compact genetic algorithm (rECGA), which
-supplies a solution to continuous problems.  The basic idea of the
+function optimization problems, in 2006, Chao-Hong Chen \textit{et al}.\ proposed
+the real-coded extended compact genetic algorithm
+(rECGA)~\cite{chen2006adaptive}, which supplies a solution to continuous
+problems.  The basic idea of the
 proposed rECGA is the adaptive segmentation and integer coded on the
 domain of each decision variable.  By segmenting the continuous domain
 with integer codes, the problem is changed from searching a solution to
@@ -180,8 +230,8 @@ search, but at late stages, SoD requires a smaller $\gamma$ to implement
 a more fine model for local search. 
 
 The detail algorithm of SoD is given in Algorithm~\ref{algo:SoD}, and
-the algorithm of rECGA with SoD is given in Algorithm ~\ref{alg:rECGA}.
-\begin{algorithm} \label{algo:SoD} {
+the algorithm of rECGA with SoD is given in Algorithm~\ref{alg:rECGA}.
+\begin{algorithm}  {
     \KwIn{$upper\_bound$,$lower\_bound$}\ \Begin {
     Split($upper\_bound$,$lower\_bound$)\; $\gamma = \gamma
   \times\epsilon$\;} \Begin(Split) { mid = $random(high,low)$\; rateHigh
@@ -189,9 +239,9 @@ the algorithm of rECGA with SoD is given in Algorithm ~\ref{alg:rECGA}.
     $individualsNum(mid,low) /N$\; \If{rateHigh \textgreater $\gamma$} {
     Split(high,mid)\;   } \Else { AddCode(high,mid)\;    } \If{rateLow
     \textgreater $\gamma$} { Split(mid,low)\;     } \Else {
-    AddCode(mid,low)\; } } } \caption{SoD} \end{algorithm}
+    AddCode(mid,low)\; } } } \caption{SoD} \label{algo:SoD}\end{algorithm}
 
-\begin{algorithm} \label{alg:rECGA} \caption{rECGA with SoD} Initial
+\begin{algorithm}  \caption{rECGA with SoD} \label{alg:rECGA}Initial
   population\; \While{model is not converged} { perform tournament
     selection\; encode each dimension by executing SoD\; model the
     population by greedy MPM search illustrated above\; generate
@@ -225,11 +275,11 @@ iteratively by mutation on current solutions and replace old solutions
 under selection.  Here the repeated process of each iteration in ES is
 formulated and the notations will be described below
 
-\begin{center} {\large $\vec{x_i} \leftarrow m + \sigma
-  N_i(0,\mathcal{C})$,\\ where $i = 1,\ldots, \lambda$.}
+  \[\vec{x_i} \leftarrow m + \sigma N_i(0,\mathcal{C}),\]
+where $i = 1,2,\ldots, \lambda$.
 
 
-
+\begin{center}
   \begin{tabular}{|>{\centering} m{0.7in} | m{4.2in}|} \hline
     $\vec{x_i}$    & $\vec{x_i}$ is the \textit{i}-th generated
     offspring and denoted as vector.\\\hline $m$      & The mean vector
@@ -258,10 +308,9 @@ selected out of the candidate pool as the parent of next generation.
 The routine keeps executing until termination criteria, a limit number
 of function evaluation for example is met.
 
-Two well-known types of ESs are ($\mu, \lambda$)-ES and ($\mu+
-\lambda,\lambda$)-ES\@.  The difference between them is that ($\mu,
+Two well-known types of ESs are ($\mu, \lambda$)-ES and ($\mu+\lambda$)-ES\@.  The difference between them is that ($\mu,
 \lambda$)-ES selects new $\mu$ candidate solutions from $\lambda$
-generated solutions, while ($\mu+ \lambda, \lambda$)-ES selects new
+generated solutions, while ($\mu+\lambda$)-ES selects new
 $\mu$ candidate solutions from the union of original population and
 $\lambda$ generated solutions.  Under the mechanism, there are different
 properties for each: ($\mu+ \lambda$) selection is an elitist strategy,
@@ -308,10 +357,10 @@ factor which controls the proportion and thus adaptively changes value
 according to the environment.
 
 Here we provide a simple instance for adaptively changing $\sigma$.  It
-is named `One-Fifth success rule' and can be formulated as below
+is named `One-Fifth success rule' and can be formulated as below.
 
-\begin{center} {\Large $\sigma \leftarrow \sigma \times \exp^{\left(
-    \frac{1}{3} \times \frac{P_s-P_t}{1-P_t} \right)}$}\\ \end{center}
+\begin{center} {$\sigma \leftarrow \sigma \times \exp^{\left(
+    \frac{1}{3} \times \frac{P_s-P_t}{1-P_t} \right)},$}\\ \end{center}
   where $\sigma$ is initial to $1$, $P_s$ stands for the proportion of
   offspring that better than parent and $P_t$ is the target probability
   $\frac{1}{5}$.  We can observe from the formula that once $\sigma$
@@ -328,16 +377,16 @@ is named `One-Fifth success rule' and can be formulated as below
   size to increase the exploration.
 
   To sum up, we can formulate the update of the $\sigma$ as following:\\
-  \begin{center} {\large $p_{\sigma} =
+  \begin{center} {$p_{\sigma} =
     (1-c_{\sigma})p_{\sigma}+\sqrt{1-{\left(
       1-c_{\sigma}\right)}^2}\sqrt{\mathbf{\mu_w}}\mathbf{y_w}$\\
       $\sigma = \sigma \times \exp^{ \frac{c_{\sigma}}{d_{\sigma}}
       \left(\frac{\left|| p_{\sigma} \right||}{
-        E\||{\mathcal{N}(0,I)}\||} -1 \right)  }$\\ } \end{center} where
+        E\||{\mathcal{N}(0,I)}\||} -1 \right)  },$\\ } \end{center} where
       $p_{\sigma}$ is the cumulative evolutionary path initial to
       $\vec{\textbf{0}}$, $c_{\sigma}$ and $d_{\sigma}$ are pre-defined
       constants, $\mathbf{\mu_w}$ is the sum of the inverse squared
-      weight of generated solution,and $\mathbf{y_w}$ is the weighted
+      weight of generated solution, and $\mathbf{y_w}$ is the weighted
       sum of noise generated .  \subsubsection{Covariance matrix} Recall
       the term `linkage' we discussed in the previous section, there are
       dependency between $n$ decision variables.  As we mentioned, ES
@@ -376,14 +425,19 @@ is named `One-Fifth success rule' and can be formulated as below
   than the first.
 
       CMA-ES combines the feature of both and can be formulated
-      accordingly \begin{center} $\mathbf{{P_c}} =
-        (1-c_c)\mathbf{{P_c}}+\left\{ \begin{array}{cc}
+      accordingly 
+      \begin{center} 
+        $\mathbf{{P_c}} = (1-c_c)\mathbf{{P_c}}+\left\{
+          \begin{array}{ll}
           \sqrt{1-{\left(1-c_c\right)}^2}\sqrt{\mu_w}{\mathbf{y_w}} &
-          if\|\mathbf{p_{\sigma}}\| < 1.5\sqrt{n}\\ 0 & else \end{array}
+          \quad \text{if $\|\mathbf{p_{\sigma}}\| < 1.5\sqrt{n}$}\\ 0 &
+          \quad \text{otherwise }
+        \end{array}
         \right.$\\ $\mathcal{C}' = (1-c_1-c_{\mu})\mathcal{C} +
         c_1{\mathbf{P_c}}{\mathbf{P_c}}^T +
         c_{\mu}\sum\limits_{i=1}^{\mu}
-        w_i\mathbf{y_{i:\lambda}}\mathbf{y_{i:\lambda}}^T$ \end{center}
+        w_i\mathbf{y_{i:\lambda}}\mathbf{y_{i:\lambda}}^T, $ 
+      \end{center}
       where $c_1$ , $c_c$and $c_{\mu}$ are constants, $\mathbf{P_c}$,
       initial to $\mathbf{0}$ is the cumulative information of
       evolutionary path, $n$ is the number of decision variables, and
@@ -397,9 +451,9 @@ is named `One-Fifth success rule' and can be formulated as below
           proposed method makes the covariance matrix self-adaptive. 
 
           To sum up, we are going to give a detail procedure for the
-          CMA-ES in Algorithm ~\ref{algo:cmaes}:
+          CMA-ES in Algorithm~\ref{algo:cmaes}:
 
-\begin{algorithm} \label{algo:cmaes}
+\begin{algorithm} 
   \KwIn{$\mathbf{m}\in\mathbb{R}^n$,$\sigma\in\mathbb{R}$, $\lambda$}
   Initialize: $\mathcal{C} = \mathbf{I}$, $\mathbf{P_c} = \mathbf{0}$,
   $\mathbf{P_\sigma} = \mathbf{0}$\; Set: $c_c = \frac{4}{n}$, $c_\sigma
@@ -415,9 +469,10 @@ is named `One-Fifth success rule' and can be formulated as below
   \sum\limits_{i=1}^\mu w_i \mathbf{x_{i:\lambda}} = \mathbf{m}+\sigma
   \mathbf{y_w}$, where $\mathbf{y_w} = \sum\limits_{i=1}^\mu w_i
   \mathbf{y_{i:\lambda}}$\; \underline{\textbf{Cumulation for matrix}}
-  : $\mathbf{P_c} = (1-c_c)\mathbf{P_c}+\left\{ \begin{array}{cc}
+  : $\mathbf{P_c} = (1-c_c)\mathbf{P_c}+\left\{ \begin{array}{ll}
     \sqrt{1-{\left(1-c_c\right)}^2}\sqrt{\mu_w}{\mathbf{y_w}} &
-    if\|\mathbf{p_{\sigma}}\| < 1.5\sqrt{n}\\ 0 & else \end{array}
+    \quad \text{if $\|\mathbf{p_{\sigma}}\| < 1.5\sqrt{n}$}\\ 0 & \quad
+    \text{otherwise} \end{array}
   \right.$\; \underline{\textbf{Cumulation for step size}} :
   $\mathbf{p_{\sigma}} =
   (1-c_{\sigma})\mathbf{p_{\sigma}}+\sqrt{1-{\left(
@@ -429,7 +484,7 @@ is named `One-Fifth success rule' and can be formulated as below
     \underline{\textbf{Adaptation for step size}} : $\sigma = \sigma
     \times \exp^{ \frac{c_{\sigma}}{d_{\sigma}} \left(\frac{\left||
       p_{\sigma} \right||}{ E\||{\mathcal{N}(0,I)}\||} -1 \right)  }$\;
-    } \caption{CMA-ES} \end{algorithm}
+    } \caption{CMA-ES} \label{algo:cmaes}\end{algorithm}
 
 \section{Thesis objective} \label{sec:motivation}
 
@@ -445,7 +500,7 @@ CMA-ES performs well on figuring out solutions in a restrict region.
 This property, however, leads CMA-ES to a premature convergence when the
 search space grows largely. 
 
-We can first take a look at the figure~\ref{fig:localExample} to
+We can first take a look at the Figure~\ref{fig:localExample} to
 illustrate the described hazard.
 \begin{figure}[h] \begin{center}
     \includegraphics[scale = 0.5]{2Dproblem3DMap.eps}
@@ -503,7 +558,7 @@ global optimum locates.  Once there is just a small
 region, CMA-ES is believed to be capable of finding
 out the optimum inside.  The technique of estimation
 can be built in many ways.  For example, in
-section~\ref{sec:rECGA} rECGA applies discretization
+Section~\ref{sec:rECGA} rECGA applies discretization
 to reduce the search space from an infinite,
 continuous space to a finite, discrete space.
 Followed with model building to distinguish the
